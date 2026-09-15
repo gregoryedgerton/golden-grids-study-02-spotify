@@ -131,11 +131,11 @@ function StaticFallback() {
  * stage inert, and gives the page back its scroll on close.
  */
 function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }) {
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const backRef = useRef<HTMLButtonElement>(null);
   const index = records.indexOf(record);
 
   useEffect(() => {
-    closeRef.current?.focus({ preventScroll: true });
+    backRef.current?.focus({ preventScroll: true });
     const stage = document.querySelector<HTMLElement>(".dial__stage");
     if (stage) stage.inert = true;
     // The dial's depth is the page's scroll position, so leaving the page
@@ -158,6 +158,21 @@ function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }
 
   return (
     <div className="album" role="dialog" aria-modal="true" aria-label={`${record.album} by ${record.artist}`}>
+      {/* Top LEFT, not top right: the study tools float fixed at top right on
+          a stacking layer far above this dialog, so a control in that corner
+          sits under them. The bar is sticky so the way back does not scroll
+          away with a long track list. */}
+      <div className="album__bar">
+        <button ref={backRef} type="button" className="album__back" onClick={onClose}>
+          <span className="album__back-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 5 L8 12 L15 19" />
+            </svg>
+          </span>
+          Back to the dial
+        </button>
+      </div>
+
       <header className="album__head">
         <img className="album__cover" src={covers[index]} alt="" />
         <div className="album__meta">
@@ -168,7 +183,6 @@ function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }
           </p>
           <p className="album__credit">Cover: {record.credit}</p>
         </div>
-        <button ref={closeRef} type="button" className="album__close" onClick={onClose} aria-label="Close">×</button>
       </header>
 
       <ol className="tracks">
