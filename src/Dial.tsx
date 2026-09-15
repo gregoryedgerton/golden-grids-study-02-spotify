@@ -109,25 +109,25 @@ function StaticFallback() {
 }
 
 /**
- * The album view. Clicking a cover opens the record it belongs to, and the
- * track list is laid out as a GoldenGrid of its own — a second, nested use of
- * the library inside the thing the dial was showing. The tracks descend the
- * way the records do, so the same proportion carries the same meaning at both
- * scales: the opener takes the largest box.
+ * The album view. Clicking a cover opens the record it belongs to and lists
+ * its tracks.
+ *
+ * The tracks are a LIST, not a grid. They were a golden grid first — five
+ * boxes descending, opener largest — and it was wrong for the reason the
+ * programme's brief warns about: a track list is flat. Nothing about track
+ * one outranks track four, so a Fibonacci descent asserts a hierarchy the
+ * content does not have, and the two smallest boxes came out an eighth the
+ * width of the largest, holding a number and nothing else. The spiral is for
+ * the collection, where the distance between records is real. Inside one
+ * record it is decoration.
  *
  * It is a dialog, not a band: the dial behind it is a sticky, viewport-tall
- * stage that cannot grow, so the panel covers it, takes focus, traps nothing
- * but makes the stage inert, and gives the page back its scroll on close.
+ * stage that cannot grow, so the panel covers it, takes focus, makes the
+ * stage inert, and gives the page back its scroll on close.
  */
 function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const index = records.indexOf(record);
-  // Parity, from the library's own geometry: right/left give a landscape band
-  // only when the box count is even, top/bottom only when it is odd. The
-  // dialog is wider than it is tall, so the placement follows the track count
-  // rather than being fixed — five tracks would be a 5:8 portrait under
-  // `right`, and the opener would fall off the bottom of the panel.
-  const placement = record.tracks.length % 2 === 0 ? "right" : "bottom";
 
   useEffect(() => {
     closeRef.current?.focus({ preventScroll: true });
@@ -165,27 +165,22 @@ function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }
         <button ref={closeRef} type="button" className="album__close" onClick={onClose} aria-label="Close">×</button>
       </header>
 
-      <div className="album__grid">
-        <GoldenGrid from={1} to={record.tracks.length} placement={placement} clockwise={false}>
-          {record.tracks.map(([title, time], i) => (
-            <GoldenBox key={title}>
-              <div className="track">
-                <span className="track__n">{i + 1}</span>
-                <span className="track__title">{title}</span>
-                <span className="track__time">{time}</span>
-              </div>
-            </GoldenBox>
-          ))}
-        </GoldenGrid>
-      </div>
+      <ol className="tracks">
+        {record.tracks.map(([title, time], i) => (
+          <li className="track" key={title}>
+            <span className="track__n">{i + 1}</span>
+            <span className="track__title">{title}</span>
+            <span className="track__time">{time}</span>
+          </li>
+        ))}
+      </ol>
 
       <p className="album__note">
-        The track list is a second golden grid, nested inside the record the
-        dial was showing. {record.tracks.length} tracks, largest box first — the
-        same descent the collection uses, one scale down. Its{" "}
-        <code>placement</code> follows the track count, because right and left
-        are landscape only at an even count and top and bottom only at an odd
-        one.
+        The tracks are a list, not a grid. They were a golden grid first and it
+        was wrong: a track list is flat, so a Fibonacci descent asserts a
+        hierarchy the content does not have. The spiral is for the collection,
+        where the distance between records is real; inside one record it would
+        be decoration.
       </p>
     </div>
   );

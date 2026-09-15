@@ -151,50 +151,35 @@
 /* Capped so the grid always fits the dialog: the 8:5 landscape band is
    0.625 of its width tall, and the dialog gives it about 60svh. */
 .album__grid { width: min(100%, 88svh, 900px); align-self: center; justify-self: center; }
-/* The GoldenBox is the query container, not the track inside it: an element
-   never matches its own container query, and `cqw` inside an element resolves
-   against its nearest ANCESTOR container. Putting it on the slot's own
-   wrapper makes both work, and the wrapper is exactly the slot's size. */
-.album__grid .golden-grid__box > * { container-type: size; }
-
-/* A track box is a square of the golden grid, so the smallest is an eighth of
-   the width of the largest. The row layout is what the big boxes want and
-   what the small ones cannot hold, so the box itself decides: three columns
-   while there is room, then the running time goes, then the title, and the
-   smallest boxes keep the track number alone. Container queries, because the
-   deciding width is the box's, not the viewport's. */
+/* The track list. Flat content, so it is a list: one row per track, the
+   number and the running time in the secondary tier, the title in the
+   primary. No grid — see the note the panel prints, and the README. */
+.tracks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: min(100%, 760px);
+  justify-self: start;   /* flush with the album heading above it */
+  align-self: start;
+}
 .track {
-  position: absolute; inset: 3px;
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-content: center;
-  gap: 4px 12px;
-  padding: clamp(6px, 2.4cqw, 20px);
+  grid-template-columns: 2ch 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 12px;
   border-radius: 6px;
-  background: var(--card);
-  overflow: hidden;
 }
-.track__n { font: 700 clamp(12px, 9cqw, 40px)/1 var(--font); color: var(--muted); }
-.track__title {
-  font: 700 clamp(12px, 7cqw, 28px)/1.15 var(--font);
-  align-self: center;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.track__time { font: 400 clamp(11px, 5cqw, 15px)/1 var(--font); color: var(--muted); align-self: center; }
-
-@container (max-width: 190px) {
-  /* No room for a running time beside a title. */
-  .track { grid-template-columns: auto 1fr; }
-  .track__time { display: none; }
-}
-@container (max-width: 110px) {
-  /* The number alone, centred and large enough to read. */
-  .track { grid-template-columns: 1fr; justify-items: center; align-content: center; }
-  .track__title { display: none; }
-  .track__n { font-size: clamp(14px, 34cqw, 34px); color: var(--fg); }
+.track + .track { box-shadow: 0 -1px 0 var(--line); }
+.track:hover { background: var(--card); }
+.track:hover + .track { box-shadow: none; }
+.track__n { font: 400 16px/1 var(--font); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.track__title { font: 400 16px/1.3 var(--font); min-width: 0; }
+.track__time { font: 400 14px/1 var(--font); color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 639px) {
+  .track { gap: 12px; padding: 10px 8px; }
+  .track__title { font-size: 15px; }
+  .track__time { font-size: 13px; }
 }
 
 .album__note { margin: 0; max-width: 62ch; color: var(--muted); font: 400 14px/1.6 var(--font); }

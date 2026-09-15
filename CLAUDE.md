@@ -59,9 +59,11 @@ true of.
   rotated square filling its clip box. The label is held level the same way
   without the swell and sits on the tile's centre line, so the square clip box
   never cuts it. `{ counterRotate: false }` is the turning version.
-- Every cover opens its record. The track list is a nested GoldenGrid whose
-  `placement` follows the track count (parity), in a dialog that inerts the
-  stage and locks the page scroll, because the dial's depth is the scroll.
+- Every cover opens its record, in a dialog that inerts the stage and locks
+  the page scroll, because the dial's depth is the scroll.
+- The track list is a LIST, not a grid, and must stay one. It was a golden
+  grid and it was wrong: a track list is flat, so a Fibonacci descent asserts
+  a hierarchy the content does not have. The spiral is for the collection.
 - The fading window plus `tileOnScreen` plus a sub-pixel check keep the paint
   count between twelve and fourteen. A solid tail looks better mid-turn and
   paints all twenty-one — see the README's "What did not".

@@ -117,25 +117,23 @@ quotes it.
 
 ## Clicking a record
 
-Every cover is a control. Clicking one opens that record, and the track list
-is laid out as a golden grid of its own — a second, nested use of the library
-inside the thing the dial was showing. Five tracks, largest box first: the
-same descent the collection uses, one scale down.
+Every cover is a control. Clicking one opens that record and lists its tracks.
 
-The track grid's `placement` follows the track count rather than being fixed,
-because `right` and `left` give a landscape band only at an even box count and
-`top` and `bottom` only at an odd one. Five tracks under `right` would be a
-5:8 portrait and the opening track would fall off the bottom of the panel.
+**The tracks are a list, not a grid, and that is the finding.** They were a
+golden grid first — five boxes descending, opener largest, the same shape the
+collection uses one scale down. It looked deliberate and it was wrong, for the
+reason the programme's own brief warns about: a track list is flat. Nothing
+about track one outranks track four, so a Fibonacci descent asserts a
+hierarchy the content does not have. The geometry then made the point for us:
+with five boxes the two smallest are an eighth the width of the largest, so
+they could hold a track number and nothing else, and the layout had to shed
+the running time and then the title to stay legible. Needing three fallbacks
+to fit a five-item list is the content telling you it is not a spiral.
 
-A track box is a square of that grid, so the smallest is an eighth of the
-width of the largest, and the row layout the big boxes want is one the small
-ones cannot hold. The box decides for itself with container queries: three
-columns while there is room, then the running time goes, then the title, and
-the smallest boxes keep the track number alone, centred and large. Two things
-about that are easy to get wrong, and both were: an element never matches its
-own container query, and `cqw` inside an element resolves against its nearest
-*ancestor* container — so the container is declared on the slot's own wrapper,
-which is exactly the slot's size, not on the track inside it.
+The spiral is for the collection, where the distance between records is real
+and size can carry it. Inside one record it would be decoration. So the
+tracks are an ordered list, the way the reference does it, and the panel says
+so on the page.
 
 It is a dialog rather than an expanded cell, because the dial is a sticky,
 viewport-tall stage that cannot grow the way a band can. It covers the stage,
@@ -220,11 +218,10 @@ oldest.
   the spiral is what makes the dial read as movement through a collection
   rather than as a spinning picture. The same call, without the cover swell,
   keeps the labels legible from the focus all the way to the eye.
-- **The nested grid.** A record's track list laid out by the same library, one
-  scale down, makes the proportion argument twice on one page without saying
-  it twice. Its `placement` follows the track count because of parity, and its
-  boxes drop columns as they shrink — the same content decision the bands in
-  Study 01 make per breakpoint, made per box instead.
+- **Knowing where the spiral stops.** The clearest thing this study learned is
+  where its own idea does not apply: a record's track list is flat, so it gets
+  a list. The same rule Study 01 reached for its amenities — flat content gets
+  one slot, or none — held here at a different scale.
 
 ## What did not
 
@@ -245,6 +242,9 @@ oldest.
   are clickable". The readout says so in words, which is an admission that the
   affordance is not carried by the layout. A grid of covers does not need to
   be told.
+- **The track list was a golden grid and should not have been.** Built, shipped
+  and taken out again. It is documented above rather than quietly deleted,
+  because a study that only shows the library winning is an advertisement.
 
 ## Running it
 
