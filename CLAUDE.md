@@ -6,7 +6,7 @@ Guidance for agents working in a Golden Grids layout study.
 
 One page, and it is NOT a stack of bands. Study 02 is the capability
 demonstration: one deep layout driven by the spiral camera, bound to scroll,
-with twenty-one album covers on it. `src/Dial.tsx` is the whole study.
+with sixteen album covers on it. `src/Dial.tsx` is the whole study.
 
 It is also not a rebuild. The reference is a wall of equal squares, which is a
 good index and a bad argument for a spiral; the study says so in its first
@@ -69,9 +69,10 @@ true of.
 - The track list is a LIST, not a grid, and must stay one. It was a golden
   grid and it was wrong: a track list is flat, so a Fibonacci descent asserts
   a hierarchy the content does not have. The spiral is for the collection.
-- The fading window plus `tileOnScreen` plus a sub-pixel check keep the paint
-  count between twelve and fourteen. A solid tail looks better mid-turn and
-  paints all twenty-one — see the README's "What did not".
+- The fading window plus `tileOnScreen` plus a sub-pixel check hold the paint
+  count at thirteen tiles or fewer — measured 12–13 through the first third of
+  the travel, falling to three as the tail runs out. A solid tail looks better
+  mid-turn and paints all sixteen — see the README's "What did not".
 
 Two geometry rules, verified against source, that the static fallback relies on:
 

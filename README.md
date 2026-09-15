@@ -90,7 +90,8 @@ No bands. The page is one deep layout driven by the spiral camera:
   clamped raster and the deep dial goes soft.
 - `spiralWindow` fades the far tail and `tileOnScreen` culls whatever has left
   the stage; a sub-pixel check drops the deepest records at shallow depths.
-  Around a dozen tiles paint at any moment, out of sixteen.
+  Thirteen tiles paint at the busiest depth, out of sixteen, and three at
+  the end of the travel.
 
 Nothing wraps the library. `spiralCamera`, `spiralWindow`, `tileOnScreen`,
 `toCssTileTransform`, `toCssContentTransform` and `trailToRotateDeg` are
@@ -237,9 +238,10 @@ designer's credit as Discogs records it, and its track listing.
   outward records keep filling the negative space — but outward squares grow
   by φ each step, so they always cover the stage and nothing is ever culled:
   every texture paints on every frame. The fading window was chosen
-  instead, which costs some coverage at the corners mid-turn and keeps the
-  count between twelve and fourteen. Confirm on a mid-range phone, not a
-  development machine.
+  instead, which costs some coverage at the corners mid-turn and holds the
+  count at thirteen or fewer: 12–13 through the first third of the travel,
+  then down to three as the tail runs out. Confirm on a mid-range phone, not
+  a development machine.
 - **The dial is not an index.** You cannot find a specific record in it
   without travelling. That is the honest limit of the argument and the reason
   the framing paragraph is the first thing on the page.

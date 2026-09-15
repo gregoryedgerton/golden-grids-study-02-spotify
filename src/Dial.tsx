@@ -245,7 +245,7 @@ function ScrollDial() {
         // The fading window, not a solid tail. A solid tail keeps every
         // outward record at full presence, and because outward squares grow
         // by φ each step they always cover the stage — so nothing is ever
-        // culled and all twenty-one textures paint on every frame. That is
+        // culled and all sixteen textures paint on every frame. That is
         // the mid-range-phone risk the brief names. The fade drops the far
         // tail instead, and tileOnScreen culls whatever has left the stage.
         const { opacity, hidden } = spiralWindow(k, depth, COUNT);
