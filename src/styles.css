@@ -1,153 +1,55 @@
-/* Study styles. The library injects only positioning; everything visual is
-   the study's own. No framework, no design system — each study has its own
-   identity. What follows is deliberately plain scaffolding. */
+/* Study 02 — visual register matched to the reference, measured from the live
+   page's computed styles on 2026-09-15 (captures/tokens.cjs →
+   captures/reference-tokens.json). The reference's face is SpotifyMixUI,
+   which is proprietary; the study uses the fallback stack the reference
+   itself declares.
+
+   The library injects only positioning; everything visual is the study's. */
 
 :root {
-  color-scheme: light dark;
-  --bg: #f6f4ee;
-  --fg: #1c1b18;
-  --muted: #6b675c;
-  --line: #1c1b18;
-  --accent: #b8860b;
-  --tag-bg: rgba(28, 27, 24, 0.85);
-  --tag-fg: #f6f4ee;
-  --measure: 62ch;
+  color-scheme: dark;                   /* the reference has no light scheme */
+  --bg: #121212;                        /* rgb(18,18,18): the page ground */
+  --card: #1f1f1f;                      /* card ground */
+  --card-hover: #282828;
+  --line: #333333;
+  --fg: #ffffff;
+  --muted: #b3b3b3;                     /* every secondary line */
+  --accent: #1ed760;                    /* the one accent colour */
+  --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  --gutter: 16px;
+  --content: 1160px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #15140f;
-    --fg: #ece8dc;
-    --muted: #a39d8c;
-    --line: #ece8dc;
-    --tag-bg: rgba(236, 232, 220, 0.85);
-    --tag-fg: #15140f;
-  }
-}
+@media (min-width: 640px)  { :root { --gutter: 24px; } }
+@media (min-width: 1100px) { :root { --gutter: 32px; } }
 
 * { box-sizing: border-box; }
 html { background: var(--bg); color: var(--fg); }
-body {
-  margin: 0;
-  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
-a { color: inherit; text-decoration-color: var(--accent); }
-
-/* Quality floor: visible keyboard focus. */
-:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
-
-/* Quality floor: reduced motion. This scaffold animates nothing, but a study
-   that adds motion inherits the rule. A dial study must swap in a static
-   layout here, not a slower dial. */
+body { margin: 0; font: 400 16px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+a { color: var(--fg); text-decoration: underline; }
+button { font-family: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
 
-.skip {
-  position: absolute; left: 0; top: 0; padding: 0.5rem 1rem;
-  background: var(--fg); color: var(--bg);
-  transform: translateY(-120%);
-}
+.skip { position: absolute; left: 0; top: 0; padding: 8px 16px; background: var(--fg); color: var(--bg); transform: translateY(-120%); z-index: 100; }
 .skip:focus { transform: none; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-.masthead, .band, .colophon {
-  width: min(100%, 1440px);
-  margin-inline: auto;
-  padding-inline: clamp(12px, 3vw, 40px);
-}
-.masthead { padding-block: 2rem 1rem; }
-.masthead h1 { font-size: clamp(1.5rem, 3vw, 2.5rem); margin: 0 0 0.25rem; letter-spacing: -0.01em; }
-.masthead__claim { max-width: var(--measure); color: var(--muted); margin: 0; }
+.wrap { width: min(100% - 2 * var(--gutter), var(--content)); margin-inline: auto; }
 
-.band { padding-block: 1.5rem; }
-.band__header { margin-bottom: 0.75rem; }
-.band__title { font-size: 1rem; margin: 0 0 0.25rem; }
-.band__lesson { max-width: var(--measure); margin: 0 0 0.25rem; font-size: 0.9rem; }
-.band__note { font-size: 0.8rem; color: var(--muted); margin: 0; font-family: ui-monospace, monospace; }
-.band__wrap { width: 100%; }
+.masthead { padding-block: 32px 24px; }
+.masthead__kicker { margin: 0 0 12px; font: 700 13px/1.4 var(--font); color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+/* The reference sets an artist name at 800/96px; the study's title takes the
+   same role at a size its own longer string can hold. */
+.masthead h1 { margin: 0 0 16px; font: 800 clamp(40px, 8vw, 96px)/0.98 var(--font); letter-spacing: -0.02em; }
+.masthead p { margin: 0 0 12px; max-width: 62ch; font: 400 16px/1.6 var(--font); color: var(--muted); }
+.masthead p.masthead__claim { color: var(--fg); }
 
-/* --- Consumer-side patterns the catalogue bands use ---------------------- */
-/* Gutters without touching the grid: inset the content inside its slot. */
-.media.media--inset { position: absolute; inset: 4px; width: auto; height: auto; }
-/* Text over an image: an overlay INSIDE the hero box, on a scrim so the type
-   meets AA against whatever the photograph does underneath it. */
-.overlay {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 6%;
-  background: linear-gradient(to bottom, transparent 35%, rgba(0, 0, 0, 0.72));
-  color: #fff;
-}
-.overlay h3 { margin: 0 0 0.25em; font-size: clamp(1.1rem, 9cqw, 3rem); line-height: 1.05; }
-.overlay p { margin: 0; font-size: clamp(0.8rem, 3.2cqw, 1.1rem); max-width: 40ch; }
-/* A flat list in ONE slot: CSS columns, not one box per item. */
-.list { columns: 2; column-gap: 1.5rem; font-size: clamp(0.8rem, 2.4cqw, 1rem); }
-.list ul { margin: 0; padding-left: 1.1em; }
-.list li { break-inside: avoid; }
-/* Stat tiles sized by their container, so a bento needs no breakpoint. */
-.stat { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
-/* On the colour-progression fills the text is explicitly dark: the fills are
-   light in both schemes, so inheriting --fg would fail in dark mode. */
-.stat--on-fill { color: #1c1b18; }
-.stat__n { font-size: clamp(1.2rem, 30cqw, 9rem); font-weight: 800; line-height: 0.95; letter-spacing: -0.03em; }
-.stat__label { font-size: clamp(0.7rem, 4.5cqw, 1rem); opacity: 0.75; }
-/* Small text chips and buttons for scaffolding. */
-.chip { display: inline-block; font: clamp(9px, 5cqw, 12px)/1.3 ui-monospace, monospace; padding: 2px 6px; background: var(--tag-bg); color: var(--tag-fg); }
-.btn { font: inherit; padding: 0.5em 1em; border: 2px solid currentColor; background: transparent; color: inherit; cursor: pointer; }
-/* What a dropped band leaves behind: heading, note, and a visible stub. */
-.stub { border: 1px dashed var(--muted); padding: 1rem; color: var(--muted); font-size: 0.9rem; }
-/* Video fills a slot like an image; reduced motion shows the poster instead. */
-.media video { display: block; width: 100%; height: 100%; object-fit: cover; }
-.media .media__poster { display: none; }
-@media (prefers-reduced-motion: reduce) {
-  .media video { display: none; }
-  .media .media__poster { display: block; }
-}
-.copy h3 { margin: 0 0 0.25em; font-size: clamp(1rem, 8cqw, 2.5rem); line-height: 1.05; }
-.copy--center { display: flex; flex-direction: column; justify-content: center; }
-.copy--quote p { font-size: clamp(1rem, 4.2cqw, 2rem); line-height: 1.25; font-style: italic; max-width: 30ch; }
+.section { padding-block: 32px; }
+.section h2 { margin: 0 0 16px; font: 700 24px/1.3 var(--font); }
+@media (max-width: 639px) { .section h2 { font-size: 20px; } }
+.section p { margin: 0 0 12px; max-width: 62ch; color: var(--muted); }
 
-/* --- How media fills a slot -------------------------------------------- */
-/* GoldenBox is 100% × 100% of its positioned parent and applies nothing else.
-   The fill is entirely the consumer's: the image covers the box and the box
-   owns the crop. Nothing is exported at a box's aspect ratio. Per-image
-   `object-position` (set inline from the asset spec's subject placement) is
-   the escape hatch for a subject that a centred crop would lose. */
-.media { margin: 0; width: 100%; height: 100%; position: relative; overflow: hidden; }
-.media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* object-position defaults to 50% 50%; the hero overrides it inline. */
-}
-
-.media__tag {
-  position: absolute; left: 0; bottom: 0;
-  font: 11px/1.3 ui-monospace, monospace;
-  padding: 2px 6px;
-  background: var(--tag-bg); color: var(--tag-fg);
-  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-
-/* Copy slots. Content must not grow the box — the grid sets the size. */
-.copy {
-  width: 100%; height: 100%; position: relative;
-  padding: clamp(6px, 1.5vw, 20px);
-  overflow: hidden;
-  container-type: size;
-}
-.copy p { margin: 0; }
-.copy--big, .copy__big { font-size: clamp(1.25rem, 3.5cqw, 3rem); font-weight: 600; line-height: 1.1; }
-.copy__big small { font-size: 0.5em; font-weight: 400; color: var(--muted); }
-.copy--prose p { max-width: var(--measure); font-size: clamp(0.85rem, 1.6cqw, 1.1rem); }
-.copy--tiny { padding: 2px; }
-
-.placeholder-slot { outline: 3px dashed var(--accent); outline-offset: -3px; }
-
-.colophon { padding-block: 2rem 3rem; color: var(--muted); font-size: 0.85rem; }
-.colophon p { max-width: var(--measure); }
+.colophon { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var(--muted); font: 400 14px/1.6 var(--font); }
+.colophon p { max-width: 62ch; margin: 0; }

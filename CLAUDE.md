@@ -4,9 +4,13 @@ Guidance for agents working in a Golden Grids layout study.
 
 ## What this repo is
 
-One page. A short vertical stack of **bands**, each a single small-range
-`GoldenGrid` from `@gifcommit/golden-grids` with one editorial job, rebuilding
-the structure of a named reference page. Read `docs/program/PROGRAM.md` first,
+One page, and it is NOT a stack of bands. Study 02 is the capability
+demonstration: one deep layout driven by the spiral camera, bound to scroll,
+with twenty-one album covers on it. `src/Dial.tsx` is the whole study.
+
+It is also not a rebuild. The reference is a wall of equal squares, which is a
+good index and a bad argument for a spiral; the study says so in its first
+paragraph and takes the same kind of content instead of the same page. Read `docs/program/PROGRAM.md` first,
 then `docs/program/STUDY-BRIEF.md` for the brief format and the committed
 studies, then `docs/program/TEMPLATE-SPEC.md` for what this scaffold must stay
 true of.
@@ -17,8 +21,15 @@ true of.
   site — photography, wordmarks, copy — goes into the repo or the deploy.
 - The library is consumed from npm at its published version. Never link a
   local checkout. A bug found here is an issue on the library, not a patch.
-- Bands stack; they never nest. No wrapper component over `GoldenGrid` — the
-  study exists to show the real API being used directly.
+- No wrapper over the library. `spiralCamera`, `spiralWindow`, `tileOnScreen`,
+  `toCssTileTransform`, `toCssContentTransform` and `trailToRotateDeg` are
+  called directly, in the order `docs/spiral-dial.md` in the library repo
+  prescribes.
+- `TEXTURE_PX` in `src/assets.ts` is the single source of the tile's render
+  size AND the artwork's dimension. Changing one without the other is the bug
+  the brief warns about.
+- The reduced-motion path is a real static layout, not a slower dial. It is a
+  requirement, not polish.
 - Breakpoints live only in `src/lib/viewport.ts`. Three states, never two.
 - Study tools (`src/lib/tools.tsx`) are the only floating UI. Controls go
   there, on their own stacking layer; the study's stylesheet never styles them.
@@ -33,15 +44,23 @@ true of.
   placeholder content and call the study done.
 - No CSS framework, no design system, no routing, no state library, no tests.
 
-## The catalogue
+## The dial
 
-`src/App.tsx` stacks eleven bands from `src/bands/`. Each is one copyable
-pattern with one responsive lever and one lesson; the README's "For the
-template itself" table lists them. A study keeps what it needs and deletes the
-rest. Do not add a band that teaches something another band already teaches.
-Keep all eight `placement` × `clockwise` orientations represented.
+- The page is a scroll body one viewport tall per record with a sticky,
+  viewport-tall stage. Depth is the distance travelled through that body.
+- `fillRatio: 1` with the focus anchored flush into the stage's top-left
+  corner, so all of the leftover room is on one axis and the trail grows into
+  it. The same anchor must be passed to `toCssTileTransform` and
+  `tileOnScreen` as to the camera.
+- The trail is SOLVED with `trailToRotateDeg` for the count being laid out.
+  The direction cycles with the square count as well as the rotation.
+- Covers turn with their tiles; only the label counter-rotates, and it sits on
+  the tile's centre line so the square clip box never cuts it.
+- The fading window plus `tileOnScreen` plus a sub-pixel check keep the paint
+  count between twelve and fourteen. A solid tail looks better mid-turn and
+  paints all twenty-one — see the README's "What did not".
 
-Two geometry rules, verified against source, that every band relies on:
+Two geometry rules, verified against source, that the static fallback relies on:
 
 - Parity: with *n* = visible boxes (+1 for a placeholder), `right`/`left` are
   landscape only when *n* is even; `top`/`bottom` only when *n* is odd.

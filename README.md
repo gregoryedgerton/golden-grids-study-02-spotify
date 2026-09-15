@@ -1,150 +1,205 @@
-# Layout study — [REFERENCE PAGE]
+# Layout study 02 — a collection on the spiral dial
 
-> **Template notice.** This repo was forked from
-> [golden-grids-study-template](https://github.com/gregoryedgerton/golden-grids-study-template).
-> Every `[BRACKETED]` field below is a blank. The pre-publish checklist at the
-> bottom fails while any remain. Delete this notice once the study is real.
+**Live:** https://gregoryedgerton.github.io/golden-grids-study-02-spotify/
 
-**Live:** [LIVE URL — `https://<owner>.github.io/<repo>/`]
+> **This is not a rebuild.** Spotify's wall of equal squares is a scannable
+> index and the spiral is not a substitute for one. The claim is narrower and
+> harder to dismiss: here is a way of moving through a collection that a grid
+> cannot express.
 
-An unaffiliated layout study. It rebuilds the structure of a named page using
-stacked golden grids, so the comparison is between two ways of laying out the
-same content hierarchy. All imagery and copy here are original. Nothing from
-the reference site — photography, wordmarks, marketing copy — is reproduced.
+An unaffiliated layout study. It names the page it argues with, takes the same
+kind of content — a collection of square covers — and shows what the grid
+cannot do with it. The artists, albums and artwork are invented for this
+study. Nothing from Spotify or from any real release is reproduced.
 
 Built with [Golden Grids](https://github.com/gregoryedgerton/golden-grids)
 ([npm](https://www.npmjs.com/package/@gifcommit/golden-grids) ·
-[generator](https://gregoryedgerton.github.io/golden-grids/)).
+[generator](https://gregoryedgerton.github.io/golden-grids/)), from the
+[study template](https://github.com/gregoryedgerton/golden-grids-study-template).
+
+> **Status: pass one.** The dial is built and every slot is inventoried in the
+> asset spec below. The twenty-one covers are generated stand-ins at the exact
+> dimension the real artwork must be. Pass two replaces them; the shot list is
+> [`ASSETS.md`](ASSETS.md).
 
 ---
 
 ## Reference
 
-**Page:** [NAME OF PAGE] — [URL]
+**Page:** an artist page on open.spotify.com — the rows of equal album squares
+(Discography, Featuring, Discovered on, Artist Playlists).
+https://open.spotify.com/artist/3TVXtAsR1Inumwj472S9r4
 
-**Captured:** [DATE]. Full-page captures at the three reference widths live in
-[`captures/`](captures/). They are the left half of every side-by-side below.
+**Captured:** 2026-09-15, signed out, at 390 / 820 / 1440. Spotify scrolls an
+inner container rather than the document, so the capture script scrolls the
+tallest scroller and then grows the viewport to its height;
+[`captures/capture.cjs`](captures/capture.cjs) does both.
 
-| Width  | Reference                              | Rebuild                            |
-| ------ | -------------------------------------- | ---------------------------------- |
-| 390px  | ![](captures/reference-390.png)        | ![](captures/study-390.png)        |
-| 820px  | ![](captures/reference-820.png)        | ![](captures/study-820.png)        |
-| 1440px | ![](captures/reference-1440.png)       | ![](captures/study-1440.png)       |
+| Width | Reference (artist page) | Reference (album page) |
+| --- | --- | --- |
+| 390px | ![](captures/reference-grid-390.png) | ![](captures/reference-album-390.png) |
+| 820px | ![](captures/reference-grid-820.png) | ![](captures/reference-album-820.png) |
+| 1440px | ![](captures/reference-grid-1440.png) | ![](captures/reference-album-1440.png) |
 
 ## The claim
 
-[ONE SENTENCE. The structural argument this study makes. If there is no
-distinct claim, the study is redundant.]
+A collection of squares is the case the grid handles worst and the spiral
+handles natively.
 
-## Structural inventory
+The reference's rows assert that every record carries equal weight, which is
+false the moment anyone scrolls: the row exists because some records are being
+surfaced. More than that, a grid of equal squares has no way to express
+*distance*. Nothing in it says "this record is four years further back than
+that one". The spiral does that with size alone, and a scroll walks it.
 
-[The reference page's blocks, their relative weights, and what its grid does
-with them. Derived from the captures, not from memory — where memory and the
-live page disagree, the live page wins.]
+## Why album covers
 
-## Bands
+Album art is square and Fibonacci tiles are square, so nothing is lost. That
+is a content argument, not a production one — the slot crops either way, so
+the question is not whether cropping is *work* but whether cropping *destroys
+something*. A photograph is a composition; take a square out of the middle of
+a landscape and the composition goes with the sixty percent you discarded.
+Album art has no outside to lose. It is also designed to survive thumbnail
+scale, which is exactly the demand the dial makes of it.
 
-A study is a short vertical stack of bands. Each band is one small-range
-`GoldenGrid` with one editorial job. Bands stack; they never nest.
+## Structure
 
-| Band | Range (`from`–`to`) at 390 / 820 / 1440 | `placement` · `clockwise` | Editorial job | Responsive lever |
-| ---- | ---------------------------------------- | ------------------------- | ------------- | ---------------- |
-| [1]  | [1–4 / 1–4 / 1–4]                        | [bottom / right / right · cw] | [Hero and supporting shots] | [rotate placement] |
-| [2]  | [1–1 / 1–2 / 1–2]                        | [right · cw]              | [Billboard]   | [collapse + merge] |
-| [3]  | [...]                                    |                           |               |                  |
+No bands. The page is one deep layout driven by the spiral camera:
 
-Breakpoints live in one place, [`src/lib/viewport.ts`](src/lib/viewport.ts).
-Each band picks its own range, placement, and children from the viewport; no
-band carries a media query. The template's catalogue (below) shows one lever
-per band; a study uses whichever its reference page needs.
+- `generateGoldenGridLayout` lays out twenty-one squares, one per record,
+  rotated by `trailToRotateDeg` so the spiral grows into the open side of the
+  stage — right when the stage is landscape, down when it is portrait. The
+  direction cycles with the square count as well as the rotation, so it is
+  solved rather than fixed.
+- The page is a scroll body one viewport tall per record with a sticky,
+  viewport-tall stage inside it. The camera's depth is the distance travelled
+  through that body, so one viewport of scroll is one record.
+- `spiralCamera` is called at `fillRatio: 1` and the focus is anchored flush
+  into the stage's top-left corner, so all of the leftover room lies on one
+  axis and the rest of the collection grows into it. Centring the focus at the
+  default 0.62 leaves a margin on all four sides of a wide stage and the
+  spiral floats in it.
+- Each tile carries its own `toCssTileTransform`. There is deliberately no
+  transform on the stage: a scaled stage layer forces every tile through one
+  clamped raster and the deep dial goes soft.
+- `spiralWindow` fades the far tail and `tileOnScreen` culls whatever has left
+  the stage; a sub-pixel check drops the deepest records at shallow depths.
+  Between twelve and fourteen tiles paint at any moment, out of twenty-one.
+
+Nothing wraps the library. `spiralCamera`, `spiralWindow`, `tileOnScreen`,
+`toCssTileTransform`, `toCssContentTransform` and `trailToRotateDeg` are
+called directly, in the order the library's own `docs/spiral-dial.md`
+prescribes.
+
+## The two decisions
+
+The brief asks for both to be made early and stated.
+
+**1. The covers turn with their tiles.** Only the label counter-rotates, via
+`toCssContentTransform(frame, { cover: false })`. Album art reads as an object
+rather than a window, so rotation costs it nothing, and the turning version is
+the one that travels. Upright is one line away — put
+`toCssContentTransform(frame)` on `.dial__art` with a 50% 50% origin — and the
+study tried both. The label sits on the tile's centre line and is scaled back
+up by the tile's net scale, because a corner-anchored label is cut off by the
+tile's square clip box the moment the dial turns.
+
+**2. The artwork is sourced at the tile's texture box.** Every tile renders
+into a fixed 512px box and the camera scales that box, so full-resolution art
+costs exactly the smoothness that makes the dial worth showing. `TEXTURE_PX`
+in `src/assets.ts` is the single source of that number and the asset spec
+quotes it.
+
+## Reduced motion
+
+Scroll-bound rotation is genuinely unpleasant for some people, so
+`prefers-reduced-motion` produces a real static layout of the same twenty-one
+records — four stacked golden grids, largest record first — not a slower dial.
+The page says which one it is showing.
+
+The study tools panel carries a **Reduced motion** switch (`m`) so the
+fallback can be seen and captured without changing a system setting;
+`?motion=1` does the same for one load.
+
+| | Dial | Reduced motion |
+| --- | --- | --- |
+| 390px | ![](captures/dial-390-d3_5.png) | ![](captures/study-reduced-390.png) |
+| 1440px | ![](captures/dial-1440-d3_5.png) | ![](captures/study-reduced-1440.png) |
+
+Stills at four depths and three widths are in `captures/dial-*.png`;
+[`captures/dial.cjs`](captures/dial.cjs) takes them.
+
+## Visual register
+
+The structure is the argument, so everything that is not structure is held
+constant: the study uses the reference's own palette and type, measured from
+the live page on 2026-09-15 (`captures/tokens.cjs` →
+`captures/reference-tokens.json`).
+
+| Token | Reference (measured) | Study |
+| --- | --- | --- |
+| Face | SpotifyMixUI, falling back to Helvetica Neue, helvetica, arial | the same fallback stack; the face is proprietary and is not shipped |
+| Ground | `#121212`; cards `#1f1f1f`, hover `#282828`; lines `#333333` | same |
+| Text | white primary, `#b3b3b3` secondary | same |
+| Accent | `#1ed760`, the one accent colour | same, on focus rings |
+| Body | 16px 400 | same |
+| Section heading | 24px 700 (20px at 390) | same |
+| Display | 96px 800 (the artist name) | the study's title, at the same role |
+| Secondary line | 14px 400 (13px at 390) | same |
+| Cover radius | 6px | 6px in the static layout; 0 on the dial, where the tiles tile the plane |
+| Pills | 9999px | same |
+
+Colour scheme is dark only, as the reference has no light one.
 
 ## Asset spec
 
-The handoff artifact. Pass one of a study ends here: structure built, every
-slot inventoried. Pass two fills these slots with real assets. Do not fill them
-with invented placeholder content and call the study finished.
+The handoff artifact. Pass one ends here: the dial is built and every slot is
+inventoried. Pass two replaces the stand-ins with original artwork. The shot
+list with one prompt per cover is [`ASSETS.md`](ASSETS.md).
 
-Media fills its slot with `object-fit: cover`. The slot owns the crop, so no
-aspect ratio is specified — only resolution, subject placement, and what must
-survive the crop at all three widths.
+**Count:** 21. **Dimension:** 512 × 512 each, square, no exceptions — that is
+the tile's texture box, and anything larger costs the dial its smoothness
+while anything smaller is upscaled at focus.
 
-### Images
+**What the artwork has to survive:** the dial shows the same cover at a few
+hundred pixels and at a few, and rotates it through 90° per step. Strong,
+simple compositions with one idea each; a busy cover becomes noise at depth.
+No type smaller than about a tenth of the cover's width. Nothing that depends
+on being upright.
 
-| Slot | Band | Role | Min. resolution | Subject placement | Safe area |
-| ---- | ---- | ---- | --------------- | ----------------- | --------- |
-| [hero] | [1] | [The room that sells the place] | [1600×1000] | [subject upper-right; `object-position: 68% 42%`] | [what must survive at 390, 820, and 1440 — the intersection, not the desktop crop] |
-| [...]  |     |      |                 |                   |           |
-
-### Copy
-
-| Slot | Band | Role | Words at 390 / 820 / 1440 |
-| ---- | ---- | ---- | ------------------------- |
-| [title] | [1] | [Property name] | [4 / 6 / 8] |
-| [...]   |     |                 |             |
+**The records** are in `src/content.ts`: twenty-one invented artists and
+albums with years from 2016 to 2026, ordered newest first — the order the dial
+travels, so depth 0 is the most recent and the eye of the spiral is the
+oldest.
 
 ## What worked
 
-[...]
+- **Square in, square out.** Every tile is a square and every cover is a
+  square, so the layout crops nothing. This is the one content type where the
+  spiral's geometry and the material agree completely.
+- **Distance reads as size.** A record four steps back is visibly smaller and
+  further round the turn. A grid has no way to say that.
+- **The trail solve.** Rotating the layout so the spiral grows into the open
+  side of the stage is what keeps a wide desktop stage and a tall phone stage
+  both full. It has to be solved for the count, not fixed.
+- **The label rule.** Counter-rotating the label and scaling it by the tile's
+  own net scale keeps text legible from the focus all the way to the eye.
 
 ## What did not
 
-[Name what looks worse than the original and why. A study where everything
-worked is an advertisement, and readers discount all of it.]
-
-## Interactions: expand a cell
-
-Content a slot cannot hold is the obvious objection to fixed-proportion
-boxes. The answer here is not a modal: the slot that shows the summary
-becomes the whole band and shows the rest. The band grows to fit it and
-everything below moves down, so the page scrolls as one and nothing scrolls
-inside a box.
-
-Two entry points, both in the catalogue:
-
-- **Any photograph.** In Band 3 every photograph is its own control — click
-  one and that slot expands. The picture is the affordance, so a reader
-  never has to hunt for a call to action.
-- **A call to action.** In Band 6 the button in the placeholder strip
-  expands the LIST slot, not its own. A trigger and the cell it opens need
-  not be the same box.
-
-Mechanics, in [`src/lib/expand.tsx`](src/lib/expand.tsx) and `expand.css`.
-`useExpandGroup()` is the primitive: several slots in a band can be
-expandable, at most one is open, and the keys are the band's own.
-`useExpand()` is the single-slot case. The `GoldenBox` that owns the summary
-gets `cell--expanded`, and `:has()` rules release the grid's inline aspect
-ratio, take the sibling slots and the replaced summary out of the flow, and
-return the expanded slot to normal flow where its content sets the height.
-The library is not touched.
-
-What the overlay implies, and therefore does:
-
-- Everything the panel covers is `inert` while it is open — the summary
-  beside it, the trigger under it, every sibling slot — so nothing
-  underneath can be tabbed to or read.
-- Escape closes only the panel that contains focus. A form field elsewhere
-  keeps its own Escape.
-- One cell at a time, across the whole page.
-- Focus moves to the close control on every mount, so a breakpoint change
-  that remounts the panel in a different slot does not drop focus; on close
-  it returns to the trigger that opened it.
-- Nothing animates. The content moving is the feedback.
-
-## Study tools
-
-A floating panel (top right, its own stacking layer, styled independently of
-the study) carries the controls every study shares:
-
-- **Show grids** (`g`) — marching-ants outline on every grid, a dotted edge
-  and a DOM-order label on every slot (placeholder first, then smallest to
-  largest — the hero is last), the placeholder in magenta with a P.
-- **Band notes** (`n`) — the per-band `from` / `to` / `placement` readouts.
-
-Both are off by default so a study reads as its reference does. Toggles made
-in the panel persist per browser; `?inspect=1&notes=1` turns them on for one
-load, which is how overlay captures are taken. The panel is
-[`src/lib/tools.tsx`](src/lib/tools.tsx) and `tools.css`; it accepts children,
-so a study can add its own controls without touching its stylesheet.
+- **Paint cost is the real risk.** A solid tail looks better mid-turn — the
+  outward records keep filling the negative space — but outward squares grow
+  by φ each step, so they always cover the stage and nothing is ever culled:
+  all twenty-one textures paint on every frame. The fading window was chosen
+  instead, which costs some coverage at the corners mid-turn and keeps the
+  count between twelve and fourteen. Confirm on a mid-range phone, not a
+  development machine.
+- **The dial is not an index.** You cannot find a specific record in it
+  without travelling. That is the honest limit of the argument and the reason
+  the framing paragraph is the first thing on the page.
+- **One record at a time.** The reference shows forty covers at once; the dial
+  shows one clearly and a dozen partially. For browsing a collection you know,
+  that is worse.
 
 ## Running it
 
@@ -153,90 +208,31 @@ npm install
 npm run dev
 ```
 
-`npm run build` type-checks and builds to `dist/`. The library is consumed from
-the npm registry at its published version, never linked from a local checkout,
-so the study exercises what the public installs. A bug found this way belongs
-in an [issue](https://github.com/gregoryedgerton/golden-grids/issues).
+`npm run build` type-checks and builds to `dist/`. The library is consumed
+from the npm registry at its published version, never linked from a local
+checkout, so the study exercises what the public installs.
 
 ## Deploying
 
 Pushing to `main` builds and publishes to GitHub Pages. The base path derives
-from the repository name inside the workflow, so nothing in the build config
-needs editing after a fork.
-
-**One step outside the repo**, done once before the first push: point the
-repository's Pages source at GitHub Actions. Either in *Settings → Pages → Source
-→ GitHub Actions*, or from a terminal with the GitHub CLI:
-
-```bash
-gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow
-```
+from the repository name inside the workflow. The Pages source was pointed at
+GitHub Actions once with
+`gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow`.
 
 ## Pre-publish checklist
 
-Brand constraints, from the program brief:
-
-- [ ] The reference page is named, with a URL, in the README and on the page.
-- [ ] The unaffiliated-study line is visible on the page and in the README.
-- [ ] No photography, wordmark, or marketing copy from the reference site
-      appears anywhere in the repo or the deploy. Captures in `captures/` are
-      commentary and are not used as assets.
-- [ ] Every image and copy slot holds real content produced against the asset
-      spec. No placeholder images, no lorem ipsum.
-- [ ] The asset spec above is complete: every slot listed with resolution,
-      subject placement, safe area, and word counts.
-- [ ] The band table matches the source.
-- [ ] "What did not" has at least one honest entry.
-
-Quality floor, inherited from the template:
-
-- [ ] Checked and legible at 390px, 820px, and 1440px. Rebuild captures at all
-      three are in `captures/`.
-- [ ] Visible keyboard focus on every interactive element.
-- [ ] `prefers-reduced-motion` produces a real static layout, not slower motion.
-- [ ] Text contrast meets WCAG AA against whatever it sits on, including images.
-- [ ] Images that carry meaning have alt text; decorative ones have `alt=""`.
-- [ ] No `[BRACKETED]` blanks remain anywhere in the repo.
-
----
-
-## For the template itself
-
-The example page is a **catalogue**: eleven bands, each one copyable pattern,
-one responsive lever, and one thing the library does that is easy to get
-wrong. A study author keeps the bands the reference page needs and deletes
-the rest. Everything in `src/bands/` is scaffolding.
-
-| # | Band | Range 390 / 820 / 1440 | placement · clockwise | Dominant | Lever | Teaches |
-| - | ---- | ---------------------- | --------------------- | -------- | ----- | ------- |
-| 1 | Bare defaults | 1–4 all | bottom / right / right · cw | image | rotate placement | No props is 1–4, right, clockwise. `placement` names where the spiral starts, so the default puts the hero on the **left**. Hero is the **last** element in the DOM. |
-| 2 | Billboard | 1–1 / 1–2 / 1–2 | right · cw | text over image | collapse + merge | 1–2 has no hierarchy; first child on the placement side; `clockwise` a no-op. 1–1 is `single`: later children ignored, so the copy moves into the art box. |
-| 3 | Gallery | 1–3 / 1–4 / 1–5 | top / left / bottom · cw | photos | shrink + rotate in lockstep | Orientation is count × placement: right/left is landscape with an even count, top/bottom with an odd one. Declare all five; `to` trims. **Every photograph expands its own slot.** |
-| 4 | Editorial | 1–3 all | top · ccw / ccw / cw | prose | flip clockwise | `clockwise` mirrors the hero only with an odd count; with an even count only the tail reverses. Word count per width. |
-| 5 | Bento | 1–4 all | right · ccw | numbers | none | Container-unit type needs no breakpoint. `color` walks the hue 180° from smallest box to hero, lightness spread 3% × box count, centred on the base (±6% over four boxes). |
-| 6 | Amenities | 1–3 / 3–4 / 3–4 | top · cw | list | open `from` | A list gets one slot. `from=3` collapses positions 1–2 into a 2×1 placeholder: F(from)×F(from−1), rendered first, filled by the **last** child. `from=2` still makes a 1×1 placeholder; only `from=1` has none. **Its CTA expands a different slot.** |
-| 7 | Title detail | 1–4 all | left · ccw | prose ↔ art | reorder children | Images survive demotion, prose does not. Map data straight to `GoldenBox`; wrappers and fragments are dropped silently. `GoldenBox` takes `style` and `className`. |
-| 8 | Poster card | 1–3 all | left · cw | image | cap width | Height follows width; a 2:3 band at 1360px is 2040px tall. Cap the parent's width, never re-range the grid. |
-| 9 | Whitespace | 1–5 all | bottom · ccw | quote | shorten children | Children are positional: too few leaves the smallest slots empty; an empty `<GoldenBox />` blanks a specific one. |
-| 10 | Trailer | dropped / 1–4 / 1–4 | left · cw | video | drop the band | You cannot remove one slot from a spiral, so the unit of removal is the whole band. Video fills like an image; reduced motion shows the poster. |
-| 11 | Spiral dial | 13 squares | trail solved per stage | covers | reduced motion → flat grid | `spiralCamera` + per-tile transforms, bound to scroll. Covers turn, labels counter-rotate, 512px textures, static fallback. |
-
-Two rules the catalogue is built on, both verified against the 5.0.0 source:
-
-- **Parity.** Let *n* be the visible boxes plus one if there is a placeholder.
-  `right`/`left` give a landscape band only when *n* is even; `top`/`bottom`
-  only when *n* is odd.
-- **Hero side.** The largest box lands on the `placement` side turned
-  *n − 2* quarter-turns in the spiral's direction. At *n* = 4 it is opposite
-  the placement; at *n* = 3 one step round; at *n* = 2 the first child sits on
-  the placement side.
-
-All eight `placement` × `clockwise` orientations appear at least once. Tall
-bands are capped in width (`cap` on `Band`) because the grid is `width: 100%`
-of its parent with an inline aspect ratio; the parent owns the width.
-
-Verified against `@gifcommit/golden-grids` 5.0.0 source: `GoldenGrid` props
-are `from` (default 1), `to` (default 4), `color`, `outline`, `clockwise`
-(default true), `placement` (default `"right"`), `children`. Structural CSS is
-injected automatically; no stylesheet import. Sequence positions index the
-Fibonacci stops, so 1 and 2 are both value 1, 3 is 2, 4 is 3, 5 is 5.
+- [x] The reference page is named, with a URL, in the README and on the page.
+- [x] The unaffiliated line is visible on the page and in the README.
+- [x] Nothing from the reference site is reproduced: the artists, albums and
+      artwork are invented. Captures are commentary and are not used as assets.
+- [ ] Every cover is original artwork produced against the asset spec.
+      **(pass two)**
+- [x] The asset spec is complete: count, dimension, and what the artwork has
+      to survive.
+- [x] "What did not" has at least one honest entry.
+- [x] Checked and legible at 390px, 820px and 1440px.
+- [x] Visible keyboard focus.
+- [x] `prefers-reduced-motion` produces a real static layout, not a slower dial.
+- [x] Text contrast meets WCAG AA.
+- [x] Covers that carry meaning have alt text; the dial's own tiles are
+      `alt=""` because the readout names the focused record.

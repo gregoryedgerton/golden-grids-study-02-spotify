@@ -1,0 +1,89 @@
+/* The dial: a tall scroll body with a sticky, viewport-tall stage. Every tile
+   is a fixed-size texture box carrying its own camera-composed transform.
+   There is deliberately no transform on the stage — a scaled stage layer
+   forces every tile through one clamped raster and the deep dial goes soft. */
+.dial { position: relative; }
+.dial__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--bg);
+}
+.dial__tile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;   /* the tile matrix assumes a zero origin */
+  will-change: transform, opacity;
+  overflow: hidden;
+  contain: strict;
+  border-radius: 0;
+}
+.dial__art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  /* No transform: the cover turns with its tile. `toCssContentTransform(frame)`
+     here, with transform-origin 50% 50%, is the upright alternative. */
+}
+/* The label orbits with its tile but never spins. It sits on the tile's
+   centre line and is scaled from the centre, so counter-rotation can never
+   push it outside the tile's square clip box — a corner-anchored label is
+   cut off the moment the dial turns. */
+.dial__label {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%; /* counter-rotation pivots on the tile centre */
+  pointer-events: none;
+  display: grid;
+  place-content: center;
+  padding: 12%;
+}
+.dial__label .cover__label {
+  transform: scale(var(--inv, 1));
+  transform-origin: 50% 50%;
+  max-width: 62%;
+  margin-inline: auto;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.dial__readout {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 24px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75) 40%);
+  z-index: 10;
+  pointer-events: none;
+}
+.dial__readout p { margin: 0; }
+.dial__readout p:first-child { font: 700 24px/1.2 var(--font); }
+@media (max-width: 639px) { .dial__readout p:first-child { font-size: 20px; } }
+.dial__hint { margin-top: 4px; color: var(--muted); font: 400 14px/1.4 var(--font); }
+
+/* The cover label, shared by the dial and the static fallback. */
+.cover__label { display: grid; gap: 2px; }
+.cover__label b { font: 700 16px/1.25 var(--font); color: var(--fg); }
+.cover__label span { font: 400 14px/1.3 var(--font); color: var(--muted); }
+
+/* --- The reduced-motion fallback ---------------------------------------- */
+.static { display: grid; gap: 48px; padding-block: 8px 48px; }
+.static__note {
+  margin: 0;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font: 400 14px/1.5 var(--font);
+}
+.static__band { width: 100%; }
+.cover { position: absolute; inset: 4px; margin: 0; overflow: hidden; border-radius: 6px; background: var(--card); }
+.cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cover__label {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 12px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8) 60%);
+}

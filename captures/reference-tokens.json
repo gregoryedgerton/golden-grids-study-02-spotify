@@ -1,0 +1,565 @@
+{
+ "390": {
+  "fonts": [
+   [
+    "400 16px/normal",
+    107
+   ],
+   [
+    "400 13px/normal",
+    26
+   ],
+   [
+    "700 13px/normal",
+    15
+   ],
+   [
+    "400 11px/normal",
+    12
+   ],
+   [
+    "700 20px/normal",
+    12
+   ],
+   [
+    "700 16px/normal",
+    11
+   ],
+   [
+    "400 13px/13px",
+    3
+   ],
+   [
+    "800 96px/normal",
+    1
+   ],
+   [
+    "400 16px/32px",
+    1
+   ]
+  ],
+  "colors": [
+   [
+    "rgb(255, 255, 255)",
+    117
+   ],
+   [
+    "rgb(179, 179, 179)",
+    63
+   ],
+   [
+    "rgb(0, 0, 0)",
+    7
+   ],
+   [
+    "rgba(255, 255, 255, 0.7)",
+    1
+   ]
+  ],
+  "bgs": [
+   [
+    "rgb(30, 215, 96)",
+    14
+   ],
+   [
+    "rgb(51, 51, 51)",
+    12
+   ],
+   [
+    "rgb(18, 18, 18)",
+    9
+   ],
+   [
+    "rgb(255, 255, 255)",
+    7
+   ],
+   [
+    "rgb(40, 40, 40)",
+    6
+   ],
+   [
+    "rgb(31, 31, 31)",
+    5
+   ],
+   [
+    "rgb(0, 0, 0)",
+    4
+   ],
+   [
+    "rgb(179, 179, 179)",
+    4
+   ]
+  ],
+  "radii": [
+   [
+    "9999px",
+    71
+   ],
+   [
+    "6px",
+    41
+   ],
+   [
+    "4px",
+    18
+   ],
+   [
+    "500px",
+    13
+   ],
+   [
+    "50%",
+    11
+   ],
+   [
+    "8px",
+    10
+   ],
+   [
+    "2px",
+    4
+   ],
+   [
+    "23px",
+    1
+   ]
+  ],
+  "fams": [
+   [
+    "SpotifyMixUI",
+    175
+   ],
+   [
+    "SpotifyMixUITitle",
+    13
+   ]
+  ],
+  "roles": [
+   {
+    "label": "artist",
+    "text": "Drake",
+    "font": "800 96px/normal",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "sectionH2",
+    "text": "Popular",
+    "font": "700 20px/normal",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "cardTitle",
+    "text": "Views",
+    "font": "400 16px/normal",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "listeners",
+    "text": "95,355,461 monthly listene",
+    "font": "400 16px/32px",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "trackName",
+    "text": "One Dance",
+    "font": "400 16px/normal",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "duration",
+    "text": "3:57",
+    "font": "400 13px/normal",
+    "ls": "normal",
+    "color": "rgb(179, 179, 179)"
+   },
+   {
+    "label": "chip",
+    "text": "Albums",
+    "font": "400 13px/13px",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   }
+  ],
+  "covers": [
+   {
+    "w": 88,
+    "radius": "4px",
+    "shadow": "none"
+   },
+   {
+    "w": 200,
+    "radius": "6px",
+    "shadow": "none"
+   },
+   {
+    "w": 200,
+    "radius": "6px",
+    "shadow": "none"
+   },
+   {
+    "w": 200,
+    "radius": "6px",
+    "shadow": "none"
+   },
+   {
+    "w": 200,
+    "radius": "6px",
+    "shadow": "none"
+   },
+   {
+    "w": 200,
+    "radius": "6px",
+    "shadow": "none"
+   }
+  ],
+  "buttons": [
+   {
+    "t": "",
+    "w": 48,
+    "h": 48,
+    "radius": "50%",
+    "bg": "rgb(31, 31, 31)",
+    "color": "rgb(179, 179, 179)",
+    "font": "400 16px"
+   },
+   {
+    "t": "",
+    "w": 48,
+    "h": 48,
+    "radius": "9999px",
+    "bg": "rgba(0, 0, 0, 0)",
+    "color": "rgb(179, 179, 179)",
+    "font": "400 16px"
+   },
+   {
+    "t": "Sign up",
+    "w": 69,
+    "h": 32,
+    "radius": "9999px",
+    "bg": "rgba(0, 0, 0, 0)",
+    "color": "rgb(179, 179, 179)",
+    "font": "700 13px"
+   },
+   {
+    "t": "",
+    "w": 20,
+    "h": 32,
+    "radius": "23px",
+    "bg": "rgba(0, 0, 0, 0.7)",
+    "color": "rgb(255, 255, 255)",
+    "font": "400 13.3333px"
+   },
+   {
+    "t": "",
+    "w": 35,
+    "h": 35,
+    "radius": "9999px",
+    "bg": "rgb(31, 31, 31)",
+    "color": "rgb(179, 179, 179)",
+    "font": "400 13.3333px"
+   },
+   {
+    "t": "Your Privacy Cho",
+    "w": 102,
+    "h": 15,
+    "radius": "9999px",
+    "bg": "rgba(0, 0, 0, 0)",
+    "color": "rgb(179, 179, 179)",
+    "font": "400 11px"
+   }
+  ],
+  "grid": {
+   "gap": "8px",
+   "cols": 3,
+   "childPad": "0px",
+   "childRadius": "0px",
+   "childBg": "rgba(0, 0, 0, 0)"
+  },
+  "bodyBg": "rgba(0, 0, 0, 0)",
+  "bodyFont": "SpotifyMixUI, CircularSp-Arab, CircularSp-Hebr, CircularSp-Cyrl, CircularSp-Grek, CircularSp-Deva, \"Helvetica Neue\", helvetica, arial, \"Hiragino Sans\", \"Hiragino Kaku Gothic ProN\", Meiryo, \"MS Gothic\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\""
+ },
+ "1440": {
+  "fonts": [
+   [
+    "400 16px/normal",
+    123
+   ],
+   [
+    "400 14px/normal",
+    45
+   ],
+   [
+    "700 16px/normal",
+    14
+   ],
+   [
+    "700 14px/normal",
+    14
+   ],
+   [
+    "400 12px/normal",
+    12
+   ],
+   [
+    "700 24px/normal",
+    11
+   ],
+   [
+    "400 14px/14px",
+    3
+   ],
+   [
+    "400 16px/24px",
+    1
+   ],
+   [
+    "800 96px/normal",
+    1
+   ],
+   [
+    "400 16px/32px",
+    1
+   ]
+  ],
+  "colors": [
+   [
+    "rgb(255, 255, 255)",
+    132
+   ],
+   [
+    "rgb(179, 179, 179)",
+    85
+   ],
+   [
+    "rgb(0, 0, 0)",
+    7
+   ],
+   [
+    "rgba(255, 255, 255, 0.7)",
+    1
+   ]
+  ],
+  "bgs": [
+   [
+    "rgb(30, 215, 96)",
+    32
+   ],
+   [
+    "rgb(51, 51, 51)",
+    30
+   ],
+   [
+    "rgb(18, 18, 18)",
+    9
+   ],
+   [
+    "rgb(255, 255, 255)",
+    7
+   ],
+   [
+    "rgb(40, 40, 40)",
+    6
+   ],
+   [
+    "rgb(31, 31, 31)",
+    5
+   ],
+   [
+    "rgb(0, 0, 0)",
+    4
+   ],
+   [
+    "rgb(179, 179, 179)",
+    4
+   ]
+  ],
+  "radii": [
+   [
+    "9999px",
+    109
+   ],
+   [
+    "6px",
+    86
+   ],
+   [
+    "500px",
+    31
+   ],
+   [
+    "50%",
+    17
+   ],
+   [
+    "4px",
+    15
+   ],
+   [
+    "8px",
+    10
+   ],
+   [
+    "2px",
+    4
+   ],
+   [
+    "16px",
+    1
+   ]
+  ],
+  "fams": [
+   [
+    "SpotifyMixUI",
+    213
+   ],
+   [
+    "SpotifyMixUITitle",
+    12
+   ]
+  ],
+  "roles": [
+   {
+    "label": "artist",
+    "text": "Drake",
+    "font": "800 96px/normal",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "sectionH2",
+    "text": "Popular",
+    "font": "700 24px/normal",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "cardTitle",
+    "text": "Views",
+    "font": "400 16px/normal",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "listeners",
+    "text": "95,355,461 monthly listene",
+    "font": "400 16px/32px",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "trackName",
+    "text": "One Dance",
+    "font": "400 16px/normal",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   },
+   {
+    "label": "duration",
+    "text": "3:57",
+    "font": "400 14px/normal",
+    "ls": "normal",
+    "color": "rgb(179, 179, 179)"
+   },
+   {
+    "label": "chip",
+    "text": "Albums",
+    "font": "400 14px/14px",
+    "ls": "normal",
+    "color": "rgb(255, 255, 255)"
+   }
+  ],
+  "covers": [
+   {
+    "w": 88,
+    "radius": "4px",
+    "shadow": "none"
+   },
+   {
+    "w": 180,
+    "radius": "6px",
+    "shadow": "none"
+   },
+   {
+    "w": 180,
+    "radius": "6px",
+    "shadow": "none"
+   },
+   {
+    "w": 180,
+    "radius": "6px",
+    "shadow": "none"
+   },
+   {
+    "w": 180,
+    "radius": "6px",
+    "shadow": "none"
+   },
+   {
+    "w": 180,
+    "radius": "6px",
+    "shadow": "none"
+   }
+  ],
+  "buttons": [
+   {
+    "t": "",
+    "w": 48,
+    "h": 48,
+    "radius": "50%",
+    "bg": "rgb(31, 31, 31)",
+    "color": "rgb(179, 179, 179)",
+    "font": "400 16px"
+   },
+   {
+    "t": "",
+    "w": 48,
+    "h": 48,
+    "radius": "9999px",
+    "bg": "rgba(0, 0, 0, 0)",
+    "color": "rgb(179, 179, 179)",
+    "font": "400 16px"
+   },
+   {
+    "t": "",
+    "w": 24,
+    "h": 24,
+    "radius": "9999px",
+    "bg": "rgba(0, 0, 0, 0)",
+    "color": "rgb(179, 179, 179)",
+    "font": "400 16px"
+   },
+   {
+    "t": "Sign up",
+    "w": 72,
+    "h": 32,
+    "radius": "9999px",
+    "bg": "rgba(0, 0, 0, 0)",
+    "color": "rgb(179, 179, 179)",
+    "font": "700 14px"
+   },
+   {
+    "t": "",
+    "w": 35,
+    "h": 35,
+    "radius": "9999px",
+    "bg": "rgb(31, 31, 31)",
+    "color": "rgb(179, 179, 179)",
+    "font": "400 13.3333px"
+   }
+  ],
+  "grid": {
+   "gap": "8px",
+   "cols": 3,
+   "childPad": "0px",
+   "childRadius": "0px",
+   "childBg": "rgba(0, 0, 0, 0)"
+  },
+  "bodyBg": "rgba(0, 0, 0, 0)",
+  "bodyFont": "SpotifyMixUI, CircularSp-Arab, CircularSp-Hebr, CircularSp-Cyrl, CircularSp-Grek, CircularSp-Deva, \"Helvetica Neue\", helvetica, arial, \"Hiragino Sans\", \"Hiragino Kaku Gothic ProN\", Meiryo, \"MS Gothic\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\""
+ }
+}
