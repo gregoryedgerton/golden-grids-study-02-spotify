@@ -17,8 +17,13 @@ true of.
 
 ## Rules that are not negotiable
 
-- Name the reference page. Substitute every asset. Nothing from the reference
-  site — photography, wordmarks, copy — goes into the repo or the deploy.
+- Name the reference page. Nothing from the reference site — photography,
+  wordmarks, copy — goes into the repo or the deploy.
+- The covers ARE real, and that is allowed here because they are the
+  designer's own work: every release on the dial carries a Discogs credit to
+  Greg Edgerton for layout, design, art direction or artwork. The recordings
+  are not his; nothing is offered for playback. `ASSETS.md` is the provenance
+  and must stay accurate — if a cover is swapped, its row changes with it.
 - The library is consumed from npm at its published version. Never link a
   local checkout. A bug found here is an issue on the library, not a patch.
 - No wrapper over the library. `spiralCamera`, `spiralWindow`, `tileOnScreen`,

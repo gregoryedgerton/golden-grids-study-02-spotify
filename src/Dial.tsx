@@ -75,12 +75,17 @@ export function Dial() {
  * page says which one it is showing.
  */
 function StaticFallback() {
-  const bands = [
-    { from: 1, to: 6, placement: "bottom" as const, take: [0, 6] },
-    { from: 1, to: 6, placement: "right" as const, take: [6, 12] },
-    { from: 1, to: 5, placement: "top" as const, take: [12, 17] },
-    { from: 1, to: 4, placement: "left" as const, take: [17, 21] },
-  ];
+  // Four bands over however many records there are, largest first in each.
+  // The ranges follow the box count so every band stays landscape: right and
+  // left need an even count, top and bottom an odd one.
+  const sizes = [6, 6, 4, records.length - 16 + 4].map((n) => Math.max(2, n));
+  const placements = ["bottom", "right", "top", "left"] as const;
+  let cursor = 0;
+  const bands = sizes.map((n, i) => {
+    const take: [number, number] = [cursor, Math.min(cursor + n, records.length)];
+    cursor = take[1];
+    return { from: 1, to: take[1] - take[0], placement: placements[i], take };
+  }).filter((b) => b.to >= 2);
   return (
     <div className="static wrap">
       <p className="static__note">{study.reducedNotice}</p>
@@ -90,7 +95,7 @@ function StaticFallback() {
             {records.slice(b.take[0], b.take[1]).map((r, j) => {
               const k = b.take[0] + j;
               return (
-                <GoldenBox key={r.album}>
+                <GoldenBox key={r.album + r.year}>
                   <figure className="cover">
                     <img src={covers[k]} alt={`${r.album} by ${r.artist}`} />
                     <figcaption className="cover__label">
@@ -159,15 +164,16 @@ function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }
           <p className="album__kind">Album</p>
           <h2 className="album__title">{record.album}</h2>
           <p className="album__sub">
-            {record.artist} · {record.year} · {record.tracks.length} songs
+            {record.artist} · {record.year} · {record.label} · {record.tracks.length} songs
           </p>
+          <p className="album__credit">Cover: {record.credit}</p>
         </div>
         <button ref={closeRef} type="button" className="album__close" onClick={onClose} aria-label="Close">×</button>
       </header>
 
       <ol className="tracks">
         {record.tracks.map(([title, time], i) => (
-          <li className="track" key={title}>
+          <li className="track" key={title + i}>
             <span className="track__n">{i + 1}</span>
             <span className="track__title">{title}</span>
             <span className="track__time">{time}</span>

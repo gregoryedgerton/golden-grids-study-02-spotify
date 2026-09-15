@@ -35,7 +35,7 @@ export function App() {
         <h2>How it is built</h2>
         <p>{study.dialNote}</p>
         <p>
-          Twenty-one covers, one square each, laid out by{" "}
+          Sixteen covers, one square each, laid out by{" "}
           <code>generateGoldenGridLayout</code> and moved through by{" "}
           <code>spiralCamera</code>. The page is a scroll body one viewport tall
           per record; the camera's depth is the distance travelled through it.
@@ -46,9 +46,11 @@ export function App() {
       <footer className="colophon wrap">
         <p>
           An unaffiliated layout study of{" "}
-          <a href={study.reference.url}>{study.reference.label}</a>. The artists,
-          albums and artwork are invented for this study; nothing from Spotify or
-          from any real release is reproduced. Built with{" "}
+          <a href={study.reference.url}>{study.reference.label}</a>. Nothing from
+          Spotify is reproduced. The sixteen records are ones whose covers Greg
+          Edgerton designed; releases, credits and track listings come from{" "}
+          <a href={study.source.url}>{study.source.label}</a>, and the recordings
+          belong to their artists and labels. Built with{" "}
           <a href="https://github.com/gregoryedgerton/golden-grids">Golden Grids</a> ·{" "}
           <a href="https://www.npmjs.com/package/@gifcommit/golden-grids">npm</a> ·{" "}
           <a href="https://gregoryedgerton.github.io/golden-grids/">generator</a> ·{" "}

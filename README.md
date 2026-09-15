@@ -9,18 +9,24 @@
 
 An unaffiliated layout study. It names the page it argues with, takes the same
 kind of content — a collection of square covers — and shows what the grid
-cannot do with it. The artists, albums and artwork are invented for this
-study. Nothing from Spotify or from any real release is reproduced.
+cannot do with it.
+
+The collection is real: sixteen records whose covers Greg Edgerton designed,
+from 2002 to 2009, newest first. Releases, credits and track listings come
+from [Discogs](https://www.discogs.com/artist/3501563-Greg-Edgerton). The
+artwork is the designer's own work, shown as a portfolio; the recordings
+belong to their artists and labels and nothing here is offered for playback.
+Nothing from Spotify is reproduced.
 
 Built with [Golden Grids](https://github.com/gregoryedgerton/golden-grids)
 ([npm](https://www.npmjs.com/package/@gifcommit/golden-grids) ·
 [generator](https://gregoryedgerton.github.io/golden-grids/)), from the
 [study template](https://github.com/gregoryedgerton/golden-grids-study-template).
 
-> **Status: pass one.** The dial is built and every slot is inventoried in the
-> asset spec below. The twenty-one covers are generated stand-ins at the exact
-> dimension the real artwork must be. Pass two replaces them; the shot list is
-> [`ASSETS.md`](ASSETS.md).
+> **Status: built.** Sixteen real covers at the tile's texture size, with the
+> real track listings behind them. [`ASSETS.md`](ASSETS.md) is the provenance:
+> where each scan came from, the credit on each release, and how the files
+> were made. What remains is the written post.
 
 ---
 
@@ -66,7 +72,7 @@ scale, which is exactly the demand the dial makes of it.
 
 No bands. The page is one deep layout driven by the spiral camera:
 
-- `generateGoldenGridLayout` lays out twenty-one squares, one per record,
+- `generateGoldenGridLayout` lays out sixteen squares, one per record,
   rotated by `trailToRotateDeg` so the spiral grows into the open side of the
   stage — right when the stage is landscape, down when it is portrait. The
   direction cycles with the square count as well as the rotation, so it is
@@ -84,7 +90,7 @@ No bands. The page is one deep layout driven by the spiral camera:
   clamped raster and the deep dial goes soft.
 - `spiralWindow` fades the far tail and `tileOnScreen` culls whatever has left
   the stage; a sub-pixel check drops the deepest records at shallow depths.
-  Between twelve and fourteen tiles paint at any moment, out of twenty-one.
+  Around a dozen tiles paint at any moment, out of sixteen.
 
 Nothing wraps the library. `spiralCamera`, `spiralWindow`, `tileOnScreen`,
 `toCssTileTransform`, `toCssContentTransform` and `trailToRotateDeg` are
@@ -98,7 +104,7 @@ The brief asks for both to be made early and stated.
 **1. The covers stay level.** Both versions were built and the level one won.
 Turning art is the more dramatic still, but in motion a cover that spins reads
 as a spinning picture rather than as a record you are moving past, and
-twenty-one of them turning at once is a great deal of rotation on screen.
+sixteen of them turning at once is a great deal of rotation on screen.
 
 `toCssContentTransform(frame)` on the artwork does it: counter-rotation about
 the tile's own centre — unlike the tile matrix, which assumes a zero origin —
@@ -145,7 +151,7 @@ that opened it. Escape closes.
 ## Reduced motion
 
 Scroll-bound rotation is genuinely unpleasant for some people, so
-`prefers-reduced-motion` produces a real static layout of the same twenty-one
+`prefers-reduced-motion` produces a real static layout of the same sixteen
 records — four stacked golden grids, largest record first — not a slower dial.
 The page says which one it is showing.
 
@@ -189,20 +195,22 @@ The handoff artifact. Pass one ends here: the dial is built and every slot is
 inventoried. Pass two replaces the stand-ins with original artwork. The shot
 list with one prompt per cover is [`ASSETS.md`](ASSETS.md).
 
-**Count:** 21. **Dimension:** 512 × 512 each, square, no exceptions — that is
+**Count:** 16. **Dimension:** 512 × 512 each, square, no exceptions — that is
 the tile's texture box, and anything larger costs the dial its smoothness
-while anything smaller is upscaled at focus.
+while anything smaller is upscaled at focus. Three of the sixteen had no scan
+at 512 and were upsampled; `ASSETS.md` marks them, and a better scan drops in
+as `-v2` at the same size.
 
 **What the artwork has to survive:** the dial shows the same cover at a few
-hundred pixels and at a few, and rotates it through 90° per step. Strong,
-simple compositions with one idea each; a busy cover becomes noise at depth.
-No type smaller than about a tenth of the cover's width. Nothing that depends
-on being upright.
+hundred pixels and at a few. Strong, simple compositions read best; a busy
+cover becomes noise at depth. Rotation is not a constraint on the artwork —
+the covers are held level while their tiles turn — and putting real covers on
+the dial is part of why that decision went the way it did.
 
-**The records** are in `src/content.ts`: twenty-one invented artists and
-albums with years from 2016 to 2026, ordered newest first — the order the dial
-travels, so depth 0 is the most recent and the eye of the spiral is the
-oldest.
+**The records** are in `src/content.ts`: sixteen releases from 2002 to 2009,
+ordered newest first — the order the dial travels, so depth 0 is 2009 and the
+eye of the spiral is 2002. Each carries its artist, year, label, the
+designer's credit as Discogs records it, and its track listing.
 
 ## What worked
 
@@ -228,7 +236,7 @@ oldest.
 - **Paint cost is the real risk.** A solid tail looks better mid-turn — the
   outward records keep filling the negative space — but outward squares grow
   by φ each step, so they always cover the stage and nothing is ever culled:
-  all twenty-one textures paint on every frame. The fading window was chosen
+  every texture paints on every frame. The fading window was chosen
   instead, which costs some coverage at the corners mid-turn and keeps the
   count between twelve and fourteen. Confirm on a mid-range phone, not a
   development machine.
@@ -268,10 +276,11 @@ GitHub Actions once with
 
 - [x] The reference page is named, with a URL, in the README and on the page.
 - [x] The unaffiliated line is visible on the page and in the README.
-- [x] Nothing from the reference site is reproduced: the artists, albums and
-      artwork are invented. Captures are commentary and are not used as assets.
-- [ ] Every cover is original artwork produced against the asset spec.
-      **(pass two)**
+- [x] Nothing from the reference site is reproduced. Captures are commentary
+      and are not used as assets. The covers are the designer's own work and
+      the recordings are credited to their artists and labels.
+- [x] Every cover is the designer's own work, with its provenance and credit
+      recorded in `ASSETS.md`.
 - [x] The asset spec is complete: count, dimension, and what the artwork has
       to survive.
 - [x] "What did not" has at least one honest entry.
