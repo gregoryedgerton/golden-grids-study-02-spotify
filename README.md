@@ -90,8 +90,8 @@ No bands. The page is one deep layout driven by the spiral camera:
   clamped raster and the deep dial goes soft.
 - `spiralWindow` fades the far tail and `tileOnScreen` culls whatever has left
   the stage; a sub-pixel check drops the deepest records at shallow depths.
-  Thirteen tiles paint at the busiest depth, out of sixteen, and three at
-  the end of the travel.
+  Fifteen of the sixteen tiles still paint at the busiest depth; three do at
+  the end of the travel. The window is a late saving, not a mid-turn one.
 
 Nothing wraps the library. `spiralCamera`, `spiralWindow`, `tileOnScreen`,
 `toCssTileTransform`, `toCssContentTransform` and `trailToRotateDeg` are
@@ -234,14 +234,21 @@ designer's credit as Discogs records it, and its track listing.
 
 ## What did not
 
-- **Paint cost is the real risk.** A solid tail looks better mid-turn — the
-  outward records keep filling the negative space — but outward squares grow
-  by φ each step, so they always cover the stage and nothing is ever culled:
-  every texture paints on every frame. The fading window was chosen
-  instead, which costs some coverage at the corners mid-turn and holds the
-  count at thirteen or fewer: 12–13 through the first third of the travel,
-  then down to three as the tail runs out. Confirm on a mid-range phone, not
-  a development machine.
+- **Paint cost is the real risk, and the window does not solve it where it
+  matters.** A solid tail looks better mid-turn — the outward records keep
+  filling the negative space — but outward squares grow by φ each step, so
+  they always cover the stage and nothing is ever culled: all sixteen
+  textures paint on every frame. The fading window was chosen instead, and it
+  buys much less than this page first claimed. Measured on the deploy: at the
+  busiest depth fifteen of sixteen tiles still paint at 1200×900, and
+  fourteen at 375×812. The count only falls away in the back half of the
+  travel, reaching three at the end. So the window costs some coverage at the
+  corners mid-turn and saves one or two tiles at the exact moment the paint
+  load is worst. The mid-range-phone risk the brief names is still there;
+  what would actually address it is fewer textures or a smaller `TEXTURE_PX`,
+  not this window. Confirm on a real phone, not a development machine.
+  (An earlier revision of this file said the count stayed at thirteen or
+  fewer. That number came from too coarse a sample and was wrong.)
 - **The dial is not an index.** You cannot find a specific record in it
   without travelling. That is the honest limit of the argument and the reason
   the framing paragraph is the first thing on the page.

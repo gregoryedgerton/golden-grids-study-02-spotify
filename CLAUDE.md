@@ -69,10 +69,18 @@ true of.
 - The track list is a LIST, not a grid, and must stay one. It was a golden
   grid and it was wrong: a track list is flat, so a Fibonacci descent asserts
   a hierarchy the content does not have. The spiral is for the collection.
-- The fading window plus `tileOnScreen` plus a sub-pixel check hold the paint
-  count at thirteen tiles or fewer — measured 12–13 through the first third of
-  the travel, falling to three as the tail runs out. A solid tail looks better
-  mid-turn and paints all sixteen — see the README's "What did not".
+- The fading window plus `tileOnScreen` plus a sub-pixel check do NOT hold the
+  paint count low where it matters. Measured on the deploy: fifteen of sixteen
+  tiles still paint at the busiest depth at 1200×900, fourteen at 375×812, and
+  the count only falls to three in the back half of the travel. A solid tail
+  paints all sixteen, so the window saves one or two tiles at the worst
+  moment. Do not restate this as a solved paint budget — the README's "What
+  did not" says plainly that it is not one.
+- When measuring the paint count, FRONT THE TAB. The paint loop runs on
+  `requestAnimationFrame`, which a background tab pauses, so every tile reads
+  `visibility: hidden` and the count reads zero. Sample at 0.25 depth steps or
+  finer and let each step settle; a coarse sample walks straight past the
+  peak, which is how the wrong number got published in the first place.
 
 Two geometry rules, verified against source, that the static fallback relies on:
 
