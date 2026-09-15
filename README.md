@@ -127,6 +127,16 @@ because `right` and `left` give a landscape band only at an even box count and
 `top` and `bottom` only at an odd one. Five tracks under `right` would be a
 5:8 portrait and the opening track would fall off the bottom of the panel.
 
+A track box is a square of that grid, so the smallest is an eighth of the
+width of the largest, and the row layout the big boxes want is one the small
+ones cannot hold. The box decides for itself with container queries: three
+columns while there is room, then the running time goes, then the title, and
+the smallest boxes keep the track number alone, centred and large. Two things
+about that are easy to get wrong, and both were: an element never matches its
+own container query, and `cqw` inside an element resolves against its nearest
+*ancestor* container — so the container is declared on the slot's own wrapper,
+which is exactly the slot's size, not on the track inside it.
+
 It is a dialog rather than an expanded cell, because the dial is a sticky,
 viewport-tall stage that cannot grow the way a band can. It covers the stage,
 takes focus, makes the stage `inert`, locks the page scroll — the dial's depth
@@ -212,7 +222,9 @@ oldest.
   keeps the labels legible from the focus all the way to the eye.
 - **The nested grid.** A record's track list laid out by the same library, one
   scale down, makes the proportion argument twice on one page without saying
-  it twice.
+  it twice. Its `placement` follows the track count because of parity, and its
+  boxes drop columns as they shrink — the same content decision the bands in
+  Study 01 make per breakpoint, made per box instead.
 
 ## What did not
 
@@ -229,6 +241,10 @@ oldest.
 - **One record at a time.** The reference shows forty covers at once; the dial
   shows one clearly and a dozen partially. For browsing a collection you know,
   that is worse.
+- **The dial does not advertise itself.** Nothing about a spiral says "these
+  are clickable". The readout says so in words, which is an admission that the
+  affordance is not carried by the layout. A grid of covers does not need to
+  be told.
 
 ## Running it
 

@@ -16,7 +16,7 @@ export const study = {
     label: "an artist page on spotify.com",
     url: "https://open.spotify.com/artist/3TVXtAsR1Inumwj472S9r4",
   },
-  hint: "Scroll to dial. Every record passes through the focus.",
+  hint: "Scroll to dial. Click any cover to open its track list.",
   reducedNotice:
     "Reduced motion is on, so the dial is replaced by a static layout of the same records. That is the fallback, not a slower dial.",
   dialNote:
