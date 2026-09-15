@@ -110,11 +110,14 @@ sixteen of them turning at once is a great deal of rotation on screen.
 `toCssContentTransform(frame)` on the artwork does it: counter-rotation about
 the tile's own centre — unlike the tile matrix, which assumes a zero origin —
 plus the |cos| + |sin| cover swell that keeps the rotated square filling its
-clip box, exactly 1 at rest and √2 at worst. The label is held level the same
-way without the swell, sits on the tile's centre line, and is scaled back up
-by the tile's net scale; a corner-anchored label is cut off by the square clip
-box the moment the dial turns. `{ counterRotate: false }` is the turning
-version, one argument away.
+clip box, exactly 1 at rest and √2 at worst. `{ counterRotate: false }` is the
+turning version, one argument away.
+
+Nothing else is written inside a tile. Each record was captioned in its own
+tile at first, every caption counter-rotated and scaled back up so it stayed
+readable, and sixteen of those on screen competed with the artwork the study
+is about. One bar at the bottom of the viewport names what is in focus and
+the covers carry themselves.
 
 **2. The artwork is sourced at the tile's texture box.** Every tile renders
 into a fixed 512px box and the camera scales that box, so full-resolution art
@@ -153,12 +156,22 @@ that opened it. Escape closes.
 
 Scroll-bound rotation is genuinely unpleasant for some people, so
 `prefers-reduced-motion` produces a real static layout of the same sixteen
-records — four stacked golden grids, largest record first — not a slower dial.
-The page says which one it is showing.
+records — stacked golden grids, largest record first — not a slower dial. The
+page says which one it is showing.
 
-The study tools panel carries a **Reduced motion** switch (`m`) so the
-fallback can be seen and captured without changing a system setting;
-`?motion=1` does the same for one load.
+That full view is also the only place the collection is **filterable**, by
+year and by the role the cover is credited to. The dial is a route through
+the collection and deliberately not an index; the full view is where you go
+to ask it a question. Filtering is what forced the band plan to be computed:
+the count changes on every click, so each band's placement is derived from
+its box count to keep it landscape, and the last band absorbs the remainder
+so no match is ever dropped. Captions shrink with their box and disappear on
+the smallest ones, because a Fibonacci descent makes the smallest a fraction
+of the largest.
+
+The study tools panel carries a **Reduced motion** switch (`m`) so the full
+view can be seen and captured without changing a system setting; `?motion=1`
+does the same for one load.
 
 | | Dial | Reduced motion |
 | --- | --- | --- |
@@ -226,8 +239,8 @@ designer's credit as Discogs records it, and its track listing.
   both full. It has to be solved for the count, not fixed.
 - **The counter-rotation.** Holding the artwork level while its tile travels
   the spiral is what makes the dial read as movement through a collection
-  rather than as a spinning picture. The same call, without the cover swell,
-  keeps the labels legible from the focus all the way to the eye.
+  rather than as a spinning picture. It is the one transform the dial cannot
+  do without.
 - **Knowing where the spiral stops.** The clearest thing this study learned is
   where its own idea does not apply: a record's track list is flat, so it gets
   a list. The same rule Study 01 reached for its amenities — flat content gets

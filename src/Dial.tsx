@@ -70,46 +70,169 @@ export function Dial() {
 }
 
 /**
- * The reduced-motion fallback: the same records, laid out and still. A real
- * layout, not a slower dial — the brief calls that a requirement, and the
- * page says which one it is showing.
+ * Splits a count into bands whose boxes are landscape.
+ *
+ * Verified against 5.0.0 source: with n visible boxes and no placeholder,
+ * `right` and `left` are landscape only when n is EVEN, `top` and `bottom`
+ * only when n is ODD. So the placement is derived from the band's size
+ * rather than chosen first — the old fixed list of sizes silently produced
+ * portrait bands whose comment claimed otherwise.
+ *
+ * The last band absorbs the remainder, so no record is ever dropped. A grid
+ * needs at least two boxes, so a lone record is not a band at all and the
+ * caller renders it on its own.
+ */
+function planBands(total: number) {
+  const bands: { to: number; placement: "top" | "right" | "bottom" | "left"; clockwise: boolean; take: [number, number] }[] = [];
+  let cursor = 0;
+  let i = 0;
+  while (total - cursor >= 2) {
+    const left = total - cursor;
+    let n: number;
+    if (left <= 7) {
+      n = left;                                  // the tail, whatever it is
+    } else {
+      n = i % 2 === 1 ? 6 : 5;                   // alternate the parity, so the placements alternate too
+      if (left - n === 1) n += 1;                // never strand a single record
+    }
+    const family = n % 2 === 0 ? (["right", "left"] as const) : (["bottom", "top"] as const);
+    bands.push({
+      to: n,
+      placement: family[Math.floor(i / 2) % 2],
+      clockwise: i % 2 === 0,
+      take: [cursor, cursor + n],
+    });
+    cursor += n;
+    i++;
+  }
+  return bands;
+}
+
+/**
+ * The roles in one credit line, normalised for filtering.
+ *
+ * Discogs qualifies a role in brackets — "Design [Additional Design]",
+ * "Layout [Direction]" — which is right for the provenance table in
+ * ASSETS.md and wrong for a filter, where it splits one role into three
+ * chips nobody wants to choose between. The bracket is dropped here and
+ * nowhere else: the album view still prints the credit as Discogs wrote it.
+ */
+function rolesOf(credit: string) {
+  return credit
+    .split(",")
+    .map((part) => part.replace(/\[[^\]]*\]/g, "").trim())
+    .filter(Boolean);
+}
+
+const ALL_YEARS = Array.from(new Set(records.map((r) => r.year))).sort((a, b) => b - a);
+const ALL_ROLES = Array.from(new Set(records.flatMap((r) => rolesOf(r.credit)))).sort();
+
+function Filters({
+  year, role, onYear, onRole, shown, total,
+}: {
+  year: number | null; role: string | null;
+  onYear: (y: number | null) => void; onRole: (r: string | null) => void;
+  shown: number; total: number;
+}) {
+  return (
+    <div className="filters">
+      <div className="filters__row" role="group" aria-label="Filter by year">
+        <span className="filters__legend">Year</span>
+        <button type="button" className="chip" aria-pressed={year === null} onClick={() => onYear(null)}>All</button>
+        {ALL_YEARS.map((y) => (
+          <button key={y} type="button" className="chip" aria-pressed={year === y} onClick={() => onYear(year === y ? null : y)}>
+            {y}
+          </button>
+        ))}
+      </div>
+      <div className="filters__row" role="group" aria-label="Filter by credit role">
+        <span className="filters__legend">Role</span>
+        <button type="button" className="chip" aria-pressed={role === null} onClick={() => onRole(null)}>All</button>
+        {ALL_ROLES.map((x) => (
+          <button key={x} type="button" className="chip" aria-pressed={role === x} onClick={() => onRole(role === x ? null : x)}>
+            {x}
+          </button>
+        ))}
+      </div>
+      <p className="filters__count" aria-live="polite">
+        {shown === total ? `All ${total} records` : `${shown} of ${total} records`}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * The full view: the same records, laid out and still, with the collection
+ * filterable by year and by the role Greg is credited for. It is what
+ * `prefers-reduced-motion` gets instead of the dial, and the brief calls a
+ * real static layout a requirement rather than polish — so this is a layout
+ * in its own right, not a slower dial.
+ *
+ * Filtering is the reason `planBands` exists. A fixed list of band sizes only
+ * works for a fixed collection; here the count changes on every click, and
+ * the bands have to be re-derived so each one stays landscape and no record
+ * falls off the end.
  */
 function StaticFallback() {
-  // Four bands over however many records there are, largest first in each.
-  // The ranges follow the box count so every band stays landscape: right and
-  // left need an even count, top and bottom an odd one.
-  const sizes = [6, 6, 4, records.length - 16 + 4].map((n) => Math.max(2, n));
-  const placements = ["bottom", "right", "top", "left"] as const;
-  let cursor = 0;
-  const bands = sizes.map((n, i) => {
-    const take: [number, number] = [cursor, Math.min(cursor + n, records.length)];
-    cursor = take[1];
-    return { from: 1, to: take[1] - take[0], placement: placements[i], take };
-  }).filter((b) => b.to >= 2);
+  const [year, setYear] = useState<number | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  const shown = useMemo(
+    () => records
+      .map((r, index) => ({ r, index }))
+      .filter(({ r }) => (year === null || r.year === year) && (role === null || rolesOf(r.credit).includes(role))),
+    [year, role],
+  );
+  const bands = useMemo(() => planBands(shown.length), [shown.length]);
+
   return (
     <div className="static wrap">
       <p className="static__note">{study.reducedNotice}</p>
+
+      <Filters
+        year={year} role={role} onYear={setYear} onRole={setRole}
+        shown={shown.length} total={records.length}
+      />
+
+      {shown.length === 0 && (
+        <p className="static__empty">Nothing in the collection matches that pair. Clear one of them.</p>
+      )}
+
+      {/* A grid needs two boxes, so a single match is laid out as itself. */}
+      {shown.length === 1 && (
+        <section className="static__band static__band--one">
+          <Cover entry={shown[0]} />
+        </section>
+      )}
+
       {bands.map((b, i) => (
-        <section className="static__band" key={i}>
-          <GoldenGrid from={b.from} to={b.to} placement={b.placement} clockwise={i % 2 === 0}>
-            {records.slice(b.take[0], b.take[1]).map((r, j) => {
-              const k = b.take[0] + j;
-              return (
-                <GoldenBox key={r.album + r.year}>
-                  <figure className="cover">
-                    <img src={covers[k]} alt={`${r.album} by ${r.artist}`} />
-                    <figcaption className="cover__label">
-                      <b>{r.album}</b>
-                      <span>{r.artist} · {r.year}</span>
-                    </figcaption>
-                  </figure>
-                </GoldenBox>
-              );
-            })}
+        <section className="static__band" key={`${b.placement}-${b.take[0]}-${i}`}>
+          <GoldenGrid from={1} to={b.to} placement={b.placement} clockwise={b.clockwise}>
+            {shown.slice(b.take[0], b.take[1]).map((entry) => (
+              <GoldenBox key={entry.r.album + entry.r.year}>
+                <Cover entry={entry} />
+              </GoldenBox>
+            ))}
           </GoldenGrid>
         </section>
       ))}
     </div>
+  );
+}
+
+function Cover({ entry }: { entry: { r: Record_; index: number } }) {
+  const { r, index } = entry;
+  return (
+    <figure className="cover">
+      <img src={covers[index]} alt={`${r.album} by ${r.artist}`} />
+      <figcaption className="cover__label">
+        <b>{r.album}</b>
+        <span>{r.artist} · {r.year}</span>
+        {/* The normalised roles, so the caption reads in the same words as
+            the filter chips. The album view keeps Discogs' exact string. */}
+        <span className="cover__credit">{rolesOf(r.credit).join(", ")}</span>
+      </figcaption>
+    </figure>
   );
 }
 
@@ -244,6 +367,15 @@ function ScrollDial() {
     requestAnimationFrame(() => openerRef.current?.focus());
   }, []);
 
+  // The readout is fixed to the bottom of the viewport, so it would sit on
+  // top of the last thing on the page. Flag the document while the dial is
+  // mounted and let the stylesheet clear that much room; the static view
+  // has no bar and needs none.
+  useEffect(() => {
+    document.documentElement.dataset.readout = "on";
+    return () => { delete document.documentElement.dataset.readout; };
+  }, []);
+
   // Rebuilt only when the open side of the stage changes. The trail is
   // SOLVED for the count being laid out: which side the spiral grows into
   // cycles with the square count as well as the rotation.
@@ -301,13 +433,6 @@ function ScrollDial() {
         // spiral; only the picture inside it stays level.
         const art = tile.firstElementChild as HTMLElement;
         art.style.transform = toCssContentTransform(frame);
-        // The label is held level the same way, without the swell, and is
-        // scaled back up by the tile's net scale so it stays a readable size.
-        const label = tile.lastElementChild as HTMLElement;
-        label.style.transform = toCssContentTransform(frame, { cover: false });
-        const net = (frame.scale * square.size) / TEXTURE_PX;
-        label.style.setProperty("--inv", String(clamp(1 / Math.max(net, 0.01), 0.5, 3)));
-        label.style.opacity = net < 0.25 ? "0" : "1";
       });
 
       if (readoutRef.current) {
@@ -355,19 +480,20 @@ function ScrollDial() {
               >
                 <span className="visually-hidden">Open {r.album} by {r.artist}</span>
               </button>
-              <div className="dial__label" aria-hidden="true">
-                <span className="cover__label">
-                  <b>{r.album}</b>
-                  <span>{r.artist} · {r.year}</span>
-                </span>
-              </div>
             </div>
           );
         })}
-        <div className="dial__readout">
-          <p ref={readoutRef} aria-live="polite">{records[0].album} — {records[0].artist}, {records[0].year}</p>
-          <p className="dial__hint">{study.hint}</p>
-        </div>
+      </div>
+      {/* The readout is the ONLY place a record is named on the dial, and it
+          is a page-level bar rather than a corner of the stage. Naming each
+          cover in its own tile put sixteen labels on screen, each one
+          counter-rotated and scaled back up, competing with the artwork the
+          study is about. One bar says what is in focus; the covers carry
+          themselves. It sits under the album dialog's layer on purpose: a
+          live region floating over a modal is the wrong thing to read. */}
+      <div className="dial__readout">
+        <p ref={readoutRef} aria-live="polite">{records[0].album} — {records[0].artist}, {records[0].year}</p>
+        <p className="dial__hint">{study.hint}</p>
       </div>
       {open && <AlbumView record={open} onClose={close} />}
     </div>

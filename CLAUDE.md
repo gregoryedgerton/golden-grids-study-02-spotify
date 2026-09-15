@@ -69,9 +69,17 @@ true of.
   The direction cycles with the square count as well as the rotation.
 - Covers STAY LEVEL: `toCssContentTransform(frame)` on the artwork, about its
   own 50% 50% origin. The cover swell in that transform is what keeps the
-  rotated square filling its clip box. The label is held level the same way
-  without the swell and sits on the tile's centre line, so the square clip box
-  never cuts it. `{ counterRotate: false }` is the turning version.
+  rotated square filling its clip box. `{ counterRotate: false }` is the
+  turning version.
+- NOTHING is written inside a tile. A tile is a cover and a hit area, and
+  that is all. Naming each record in its own tile put sixteen captions on
+  screen, each counter-rotated and scaled back up, competing with the artwork
+  the study is about. The single `.dial__readout` bar names what is in focus,
+  fixed to the bottom of the viewport at z-index 40 — above the stage, below
+  the album dialog at 50, so opening a record covers the bar rather than
+  floating a live region over a modal. `[data-readout]` on the document is
+  what clears room for it at the end of the page; it is set while the dial is
+  mounted and the full view neither sets it nor needs it.
 - Every cover opens its record, in a dialog that inerts EVERYTHING outside
   itself except the study tools, and locks the page scroll, because the
   dial's depth is the scroll. Inerting only the stage is not enough: one Tab
@@ -98,7 +106,28 @@ true of.
   finer and let each step settle; a coarse sample walks straight past the
   peak, which is how the wrong number got published in the first place.
 
-Two geometry rules, verified against source, that the static fallback relies on:
+## The full view
+
+- It is what `prefers-reduced-motion` gets instead of the dial, reachable at
+  `?motion=1` or from the tools panel's `m` switch, and it is a real layout
+  in its own right. It is also the only place the collection is filterable.
+- Filters are chips above the grids: year, and the role Greg is credited for.
+  `rolesOf` strips Discogs' bracketed qualifiers (`Design [Additional]`)
+  because they split one role into chips nobody would choose between. That
+  normalisation is for the filter and the cover caption ONLY — the album view
+  prints the credit exactly as Discogs wrote it, and so does `ASSETS.md`.
+- `planBands` derives each band's placement FROM its box count, never the
+  other way round, because the count changes on every click. A fixed list of
+  sizes was there before and it silently produced portrait bands under a
+  comment claiming they were landscape. The last band absorbs the remainder
+  so no record is ever dropped, and a lone match is rendered on its own
+  because a grid needs two boxes.
+- Captions shrink with their box: each `.golden-grid__box` is a container and
+  the caption sheds its credit line, then its size, then itself. A Fibonacci
+  descent makes the smallest box a fraction of the largest, so one caption
+  size cannot serve both.
+
+Two geometry rules, verified against source, that the full view relies on:
 
 - Parity: with *n* = visible boxes (+1 for a placeholder), `right`/`left` are
   landscape only when *n* is even; `top`/`bottom` only when *n* is odd.
