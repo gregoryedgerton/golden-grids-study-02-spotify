@@ -64,9 +64,9 @@
 .cover__label span { font: 400 14px/1.3 var(--font); color: var(--muted); }
 
 /* --- The reduced-motion fallback ---------------------------------------- */
-.static { display: grid; gap: 48px; padding-block: 8px 48px; }
+.static { display: grid; gap: 48px; padding-block: 0 48px; }
 .static__note {
-  margin: 0;
+  margin: 8px 0 20px;
   padding: 16px 20px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -74,11 +74,17 @@
   font: 400 14px/1.5 var(--font);
 }
 .static__band { width: 100%; }
-.static__band--one { width: min(100%, 420px); aspect-ratio: 1; position: relative; }
-.static__empty { margin: 0; color: var(--muted); font: 400 16px/1.5 var(--font); }
+/* One record, filling a square. The cover is absolutely positioned inside
+   its box by .cover, so the wrapper has to be the box. */
+.solo { position: relative; width: min(100%, 420px); aspect-ratio: 1; margin-bottom: 48px; }
+.static__empty { margin: 0 0 48px; color: var(--muted); font: 400 16px/1.5 var(--font); }
 
 /* --- Filtering the full view --------------------------------------------- */
-.filters { display: grid; gap: 12px; }
+/* The filter leads both layouts: it is above the dial on first load and
+   above the grids in the full view. It is not sticky — the dial's whole
+   body is the scroll, so a bar pinned over it would compete with the
+   readout at the other edge. */
+.filters { display: grid; gap: 12px; padding-block: 8px 28px; }
 .filters__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .filters__legend {
   min-width: 48px;

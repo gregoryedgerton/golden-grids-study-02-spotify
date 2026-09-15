@@ -106,13 +106,43 @@ true of.
   finer and let each step settle; a coarse sample walks straight past the
   peak, which is how the wrong number got published in the first place.
 
+## Filtering
+
+- The filter belongs to the COLLECTION, not to a layout. `Dial()` holds it,
+  renders the chips above whichever layout is showing, and hands the chosen
+  records down. Toggling reduced motion keeps the choice. Do not push the
+  state back into a layout: the dial and the full view are two ways of
+  looking at one filtered set.
+- Chips sit above the dial on first load and above the grids in the full
+  view: year, and the role Greg is credited for. They are not sticky. The
+  dial's whole body IS the scroll, so a bar pinned over it would compete with
+  the readout at the other edge.
+- The DIAL count is the filtered count, and everything the camera is told
+  derives from it: the Fibonacci sequence, `trailToRotateDeg`, `spiralWindow`,
+  `focusIndexAt`, and the height of the scroll body the depth is read from.
+  A module-level `COUNT` was there before and would now be a dial of sixteen
+  showing four covers.
+- TWO RECORDS IS THE FLOOR for anything the library lays out. Both
+  `trailToRotateDeg` and `generateGoldenGridLayout` throw below it, and the
+  throw takes the whole page down, not just the dial. One match renders as
+  `SoloRecord`, a single square; zero renders a message. Never hand either
+  layout fewer than two.
+- The album dialog is mounted by `Dial()`, above both layouts, because a lone
+  record is neither a spiral nor a grid and still has to open.
+- Filtering from inside the dial returns the reader to its start, since the
+  depth they were at no longer exists in a shorter collection. Filtering from
+  the chips above it leaves the scroll alone.
+
 ## The full view
 
 - It is what `prefers-reduced-motion` gets instead of the dial, reachable at
   `?motion=1` or from the tools panel's `m` switch, and it is a real layout
-  in its own right. It is also the only place the collection is filterable.
-- Filters are chips above the grids: year, and the role Greg is credited for.
+  in its own right.
   `rolesOf` strips Discogs' bracketed qualifiers (`Design [Additional]`)
+  because they split one role into chips nobody would choose between. That
+  normalisation is for the filter and the cover caption ONLY — the album view
+  prints the credit exactly as Discogs wrote it, and so does `ASSETS.md`.
+- `rolesOf` strips Discogs' bracketed qualifiers (`Design [Additional]`)
   because they split one role into chips nobody would choose between. That
   normalisation is for the filter and the cover caption ONLY — the album view
   prints the credit exactly as Discogs wrote it, and so does `ASSETS.md`.

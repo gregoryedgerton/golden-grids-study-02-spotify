@@ -54,7 +54,9 @@ import "./dial.css";
  * `trailToRotateDeg` are called directly, in the order the library's own
  * `docs/spiral-dial.md` prescribes.
  */
-const COUNT = records.length;
+/** One entry on the dial or in the full view: the record and where it sits
+ *  in the unfiltered collection, which is what indexes its cover. */
+type Entry = { r: Record_; index: number };
 
 function fibonacci(n: number): number[] {
   const seq = [1, 1];
@@ -64,9 +66,77 @@ function fibonacci(n: number): number[] {
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
 
+/**
+ * The filter belongs to the collection, not to either layout, so it is held
+ * here and the chosen records are handed down. The dial and the full view
+ * are two ways of looking at the same filtered set; toggling reduced motion
+ * keeps whatever was chosen.
+ */
 export function Dial() {
   const reduced = useReducedMotion();
-  return reduced ? <StaticFallback /> : <ScrollDial />;
+  const [year, setYear] = useState<number | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+  // The album dialog belongs here, not to either layout: a filter can narrow
+  // the collection to ONE record, which is not a spiral and not a grid, and
+  // that record still has to open.
+  const [open, setOpen] = useState<Record_ | null>(null);
+  const openerRef = useRef<HTMLButtonElement | null>(null);
+  const onOpen = useCallback((r: Record_, opener: HTMLButtonElement) => {
+    openerRef.current = opener;
+    setOpen(r);
+  }, []);
+  const close = useCallback(() => {
+    setOpen(null);
+    requestAnimationFrame(() => openerRef.current?.focus());
+  }, []);
+
+  const shown = useMemo<Entry[]>(
+    () => records
+      .map((r, index) => ({ r, index }))
+      .filter(({ r }) => (year === null || r.year === year) && (role === null || rolesOf(r.credit).includes(role))),
+    [year, role],
+  );
+
+  return (
+    <>
+      {reduced && <p className="static__note wrap">{study.reducedNotice}</p>}
+      <div className="wrap">
+        <Filters
+          year={year} role={role} onYear={setYear} onRole={setRole}
+          shown={shown.length} total={records.length}
+        />
+        {shown.length === 0 && (
+          <p className="static__empty">Nothing in the collection matches that pair. Clear one of them.</p>
+        )}
+        {/* The library needs at least two squares — `trailToRotateDeg` and
+            `generateGoldenGridLayout` both throw below that — and one record
+            is no argument for a spiral anyway. It is shown as itself. */}
+        {shown.length === 1 && <SoloRecord entry={shown[0]} onOpen={onOpen} />}
+      </div>
+      {shown.length > 1 && (
+        reduced
+          ? <StaticFallback shown={shown} onOpen={onOpen} />
+          : <ScrollDial shown={shown} onOpen={onOpen} />
+      )}
+      {open && <AlbumView record={open} onClose={close} />}
+    </>
+  );
+}
+
+/** One record, filling a square. No grid, because a grid needs two boxes. */
+function SoloRecord({ entry, onOpen }: { entry: Entry; onOpen: (r: Record_, el: HTMLButtonElement) => void }) {
+  return (
+    <div className="solo">
+      <Cover entry={entry} />
+      <button
+        type="button"
+        className="dial__open"
+        onClick={(e) => onOpen(entry.r, e.currentTarget)}
+      >
+        <span className="visually-hidden">Open {entry.r.album} by {entry.r.artist}</span>
+      </button>
+    </div>
+  );
 }
 
 /**
@@ -135,7 +205,7 @@ function Filters({
   shown: number; total: number;
 }) {
   return (
-    <div className="filters">
+    <section className="filters" aria-label="Filter the collection">
       <div className="filters__row" role="group" aria-label="Filter by year">
         <span className="filters__legend">Year</span>
         <button type="button" className="chip" aria-pressed={year === null} onClick={() => onYear(null)}>All</button>
@@ -157,7 +227,7 @@ function Filters({
       <p className="filters__count" aria-live="polite">
         {shown === total ? `All ${total} records` : `${shown} of ${total} records`}
       </p>
-    </div>
+    </section>
   );
 }
 
@@ -173,44 +243,24 @@ function Filters({
  * the bands have to be re-derived so each one stays landscape and no record
  * falls off the end.
  */
-function StaticFallback() {
-  const [year, setYear] = useState<number | null>(null);
-  const [role, setRole] = useState<string | null>(null);
-
-  const shown = useMemo(
-    () => records
-      .map((r, index) => ({ r, index }))
-      .filter(({ r }) => (year === null || r.year === year) && (role === null || rolesOf(r.credit).includes(role))),
-    [year, role],
-  );
+function StaticFallback({ shown, onOpen }: { shown: Entry[]; onOpen: (r: Record_, el: HTMLButtonElement) => void }) {
   const bands = useMemo(() => planBands(shown.length), [shown.length]);
 
   return (
     <div className="static wrap">
-      <p className="static__note">{study.reducedNotice}</p>
-
-      <Filters
-        year={year} role={role} onYear={setYear} onRole={setRole}
-        shown={shown.length} total={records.length}
-      />
-
-      {shown.length === 0 && (
-        <p className="static__empty">Nothing in the collection matches that pair. Clear one of them.</p>
-      )}
-
-      {/* A grid needs two boxes, so a single match is laid out as itself. */}
-      {shown.length === 1 && (
-        <section className="static__band static__band--one">
-          <Cover entry={shown[0]} />
-        </section>
-      )}
-
       {bands.map((b, i) => (
         <section className="static__band" key={`${b.placement}-${b.take[0]}-${i}`}>
           <GoldenGrid from={1} to={b.to} placement={b.placement} clockwise={b.clockwise}>
             {shown.slice(b.take[0], b.take[1]).map((entry) => (
               <GoldenBox key={entry.r.album + entry.r.year}>
                 <Cover entry={entry} />
+                <button
+                  type="button"
+                  className="dial__open"
+                  onClick={(e) => onOpen(entry.r, e.currentTarget)}
+                >
+                  <span className="visually-hidden">Open {entry.r.album} by {entry.r.artist}</span>
+                </button>
               </GoldenBox>
             ))}
           </GoldenGrid>
@@ -354,18 +404,33 @@ function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }
   );
 }
 
-function ScrollDial() {
+function ScrollDial({ shown, onOpen }: { shown: Entry[]; onOpen: (r: Record_, el: HTMLButtonElement) => void }) {
+  // The count is the FILTERED count, and everything the camera is told
+  // derives from it: the Fibonacci sequence laid out, the trail solved for
+  // that many squares, the fading window, the focus index, and the height of
+  // the scroll body the depth is read from. A module-level constant would be
+  // a dial of sixteen showing four covers.
+  const count = shown.length;
   const bodyRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const tilesRef = useRef<(HTMLDivElement | null)[]>([]);
   const readoutRef = useRef<HTMLParagraphElement>(null);
   const [trail, setTrail] = useState<SpiralTrail>("bottom");
-  const [open, setOpen] = useState<Record_ | null>(null);
-  const openerRef = useRef<HTMLButtonElement | null>(null);
-  const close = useCallback(() => {
-    setOpen(null);
-    requestAnimationFrame(() => openerRef.current?.focus());
-  }, []);
+
+  // Filtering while inside the dial leaves the reader at a depth the new,
+  // shorter collection no longer has, so put them at its start. Only when
+  // they are already inside it: filtering from the controls above the dial
+  // should not yank the page down into it.
+  const prevCount = useRef(count);
+  useEffect(() => {
+    if (prevCount.current === count) return;
+    prevCount.current = count;
+    tilesRef.current.length = count;
+    const body = bodyRef.current;
+    if (!body) return;
+    const top = body.getBoundingClientRect().top + window.scrollY;
+    if (window.scrollY > top) window.scrollTo({ top, behavior: "auto" });
+  }, [count]);
 
   // The readout is fixed to the bottom of the viewport, so it would sit on
   // top of the last thing on the page. Flag the document while the dial is
@@ -380,8 +445,8 @@ function ScrollDial() {
   // SOLVED for the count being laid out: which side the spiral grows into
   // cycles with the square count as well as the rotation.
   const layout = useMemo(
-    () => generateGoldenGridLayout(fibonacci(COUNT), true, trailToRotateDeg(trail, true, COUNT)),
-    [trail]
+    () => generateGoldenGridLayout(fibonacci(count), true, trailToRotateDeg(trail, true, count)),
+    [trail, count]
   );
 
   useEffect(() => {
@@ -400,7 +465,7 @@ function ScrollDial() {
       if (open !== trail) { setTrail(open); return; }
 
       const top = body.getBoundingClientRect().top + window.scrollY;
-      const depth = clamp((window.scrollY - top) / step, 0, COUNT - 1);
+      const depth = clamp((window.scrollY - top) / step, 0, count - 1);
       // fillRatio 1 fills the stage's SHORTER side with the focused record and
       // the anchor pins it flush into the top-left corner, so every pixel of
       // leftover room lies on one axis — the long one — and the trail grows
@@ -419,7 +484,7 @@ function ScrollDial() {
         // culled and all sixteen textures paint on every frame. That is
         // the mid-range-phone risk the brief names. The fade drops the far
         // tail instead, and tileOnScreen culls whatever has left the stage.
-        const { opacity, hidden } = spiralWindow(k, depth, COUNT);
+        const { opacity, hidden } = spiralWindow(k, depth, count);
         const onScreen = tileOnScreen(frame, square, width, height, { anchor });
         // The deepest records are sub-pixel at shallow depths; painting a
         // 512px texture into two pixels helps nobody.
@@ -436,10 +501,10 @@ function ScrollDial() {
       });
 
       if (readoutRef.current) {
-        const focus = clamp(Math.round(focusIndexAt(depth, COUNT)), 0, COUNT - 1);
+        const focus = clamp(Math.round(focusIndexAt(depth, count)), 0, count - 1);
         // The dial travels newest first, so the focused square counts back
-        // from the end of the collection.
-        const r = records[COUNT - 1 - focus];
+        // from the end of whatever is on it.
+        const { r } = shown[count - 1 - focus];
         readoutRef.current.textContent = `${r.album} — ${r.artist}, ${r.year}`;
       }
     };
@@ -455,15 +520,15 @@ function ScrollDial() {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
-  }, [layout, trail]);
+  }, [layout, trail, count, shown]);
 
   return (
-    <div className="dial" ref={bodyRef} style={{ height: `${COUNT * 100}svh` }}>
-      <div className="dial__stage" ref={stageRef} role="group" aria-label={`Spiral dial of ${COUNT} records`}>
+    <div className="dial" ref={bodyRef} style={{ height: `${count * 100}svh` }}>
+      <div className="dial__stage" ref={stageRef} role="group" aria-label={`Spiral dial of ${count} records`}>
         {layout.squares.map((_, k) => {
           // Square 0 is the eye of the spiral — the oldest record — and the
           // last square is the newest, which depth 0 focuses.
-          const r = records[COUNT - 1 - k];
+          const { r, index } = shown[count - 1 - k];
           return (
             <div
               key={k}
@@ -471,12 +536,12 @@ function ScrollDial() {
               ref={(el) => { tilesRef.current[k] = el; }}
               style={{ width: TEXTURE_PX, height: TEXTURE_PX, visibility: "hidden" }}
             >
-              <img className="dial__art" src={covers[COUNT - 1 - k]} alt="" draggable={false} />
+              <img className="dial__art" src={covers[index]} alt="" draggable={false} />
               {/* The cover is the control: every record on the dial opens. */}
               <button
                 type="button"
                 className="dial__open"
-                onClick={(e) => { openerRef.current = e.currentTarget; setOpen(r); }}
+                onClick={(e) => onOpen(r, e.currentTarget)}
               >
                 <span className="visually-hidden">Open {r.album} by {r.artist}</span>
               </button>
@@ -492,10 +557,9 @@ function ScrollDial() {
           themselves. It sits under the album dialog's layer on purpose: a
           live region floating over a modal is the wrong thing to read. */}
       <div className="dial__readout">
-        <p ref={readoutRef} aria-live="polite">{records[0].album} — {records[0].artist}, {records[0].year}</p>
+        <p ref={readoutRef} aria-live="polite">{shown[0].r.album} — {shown[0].r.artist}, {shown[0].r.year}</p>
         <p className="dial__hint">{study.hint}</p>
       </div>
-      {open && <AlbumView record={open} onClose={close} />}
     </div>
   );
 }

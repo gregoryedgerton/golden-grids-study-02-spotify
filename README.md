@@ -125,6 +125,41 @@ costs exactly the smoothness that makes the dial worth showing. `TEXTURE_PX`
 in `src/assets.ts` is the single source of that number and the asset spec
 quotes it.
 
+## Filtering the collection
+
+Chips above the layout narrow the collection by year and by the role the
+cover is credited to. They are there on first load, above the dial, and they
+filter the spiral itself — the dial is rebuilt for what is left, not merely
+dimmed. The same chips sit above the grids in the full view, and the choice
+survives switching between the two, because the filter belongs to the
+collection rather than to either way of drawing it.
+
+The chips are not sticky. The dial's whole body is the scroll, so a bar
+pinned over it would compete with the readout at the opposite edge.
+
+Filtering is what forced the rest of the page to be computed rather than
+written down. The dial's square count is the filtered count, and everything
+the camera is told derives from it: the Fibonacci sequence laid out, the
+trail solved for that many squares, the fading window, the focus index, and
+the height of the scroll body the depth is read from. A fixed count would be
+a dial of sixteen showing four covers. In the full view the same pressure
+falls on the band plan: each band's placement is derived from its box count
+so it stays landscape, and the last band absorbs the remainder so no match is
+ever dropped.
+
+**Two squares is the floor, and finding that out cost a blank page.** Filter
+to a year with one release and the library throws — `trailToRotateDeg` and
+`generateGoldenGridLayout` both refuse a count below two — and the throw
+takes the whole page down, not just the dial. Three years have a single
+release, so this was reachable in two clicks. One match now renders as a
+single square, zero renders a message, and neither layout is ever handed
+fewer than two. The record dialog moved up above both layouts so that lone
+cover can still open.
+
+Filtering from inside the dial returns the reader to its start, since the
+depth they were at does not exist in a shorter collection. Filtering from the
+chips above it leaves the scroll where it is.
+
 ## Clicking a record
 
 Every cover is a control. Clicking one opens that record and lists its tracks.
@@ -159,15 +194,8 @@ Scroll-bound rotation is genuinely unpleasant for some people, so
 records — stacked golden grids, largest record first — not a slower dial. The
 page says which one it is showing.
 
-That full view is also the only place the collection is **filterable**, by
-year and by the role the cover is credited to. The dial is a route through
-the collection and deliberately not an index; the full view is where you go
-to ask it a question. Filtering is what forced the band plan to be computed:
-the count changes on every click, so each band's placement is derived from
-its box count to keep it landscape, and the last band absorbs the remainder
-so no match is ever dropped. Captions shrink with their box and disappear on
-the smallest ones, because a Fibonacci descent makes the smallest a fraction
-of the largest.
+Captions shrink with their box and disappear on the smallest ones, because a
+Fibonacci descent makes the smallest a fraction of the largest.
 
 The study tools panel carries a **Reduced motion** switch (`m`) so the full
 view can be seen and captured without changing a system setting; `?motion=1`
