@@ -26,8 +26,11 @@
   height: 100%;
   object-fit: cover;
   user-select: none;
-  /* No transform: the cover turns with its tile. `toCssContentTransform(frame)`
-     here, with transform-origin 50% 50%, is the upright alternative. */
+  /* Counter-rotated against the stage by toCssContentTransform, about its OWN
+     centre — unlike the tile matrix, which assumes a zero origin. The cover
+     swell in that transform is what keeps the rotated square filling this
+     clip box mid-turn. */
+  transform-origin: 50% 50%;
 }
 /* The label orbits with its tile but never spins. It sits on the tile's
    centre line and is scaled from the centre, so counter-rotation can never
@@ -87,3 +90,81 @@
   padding: 12px;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.8) 60%);
 }
+
+/* --- Every cover is a control -------------------------------------------- */
+/* The button covers the tile, so the whole record is the hit area. It sits
+   under the label and above the artwork. */
+.dial__open {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.dial__open:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.dial__open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.15s ease;
+}
+.dial__open:hover::after { background: rgba(255, 255, 255, 0.14); }
+@media (prefers-reduced-motion: reduce) { .dial__open::after { transition: none; } }
+
+/* --- The album view ------------------------------------------------------ */
+/* A dialog over the stage, because the dial is a sticky viewport-tall stage
+   and cannot grow the way a band can. */
+.album {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+  padding: 24px;
+  background: var(--bg);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+@media (max-width: 639px) { .album { padding: 16px; gap: 16px; } }
+
+.album__head { display: grid; grid-template-columns: auto 1fr auto; gap: 20px; align-items: end; }
+.album__cover { width: clamp(96px, 18vw, 192px); aspect-ratio: 1; border-radius: 6px; object-fit: cover; }
+.album__meta { min-width: 0; }
+.album__kind { margin: 0 0 8px; font: 700 13px/1.2 var(--font); letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.album__title { margin: 0 0 8px; font: 800 clamp(28px, 6vw, 72px)/0.98 var(--font); letter-spacing: -0.02em; }
+.album__sub { margin: 0; font: 400 14px/1.4 var(--font); color: var(--muted); }
+.album__close {
+  align-self: start;
+  width: 40px; height: 40px;
+  border: 0; border-radius: 9999px;
+  background: var(--card); color: var(--fg);
+  font: 400 22px/1 var(--font);
+  cursor: pointer;
+}
+.album__close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* The nested grid gets the room it needs without the dialog scrolling on a
+   wide screen: cap it at the shorter side so five boxes stay legible. */
+/* Capped so the grid always fits the dialog: the 8:5 landscape band is
+   0.625 of its width tall, and the dialog gives it about 60svh. */
+.album__grid { width: min(100%, 88svh, 900px); align-self: center; justify-self: center; }
+
+.track {
+  position: absolute; inset: 3px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-content: center;
+  gap: 4px 12px;
+  padding: clamp(8px, 2.4cqw, 20px);
+  border-radius: 6px;
+  background: var(--card);
+  container-type: size;
+}
+.track__n { font: 700 clamp(11px, 9cqw, 40px)/1 var(--font); color: var(--muted); }
+.track__title { font: 700 clamp(11px, 7cqw, 28px)/1.15 var(--font); align-self: center; min-width: 0; overflow: hidden; }
+.track__time { font: 400 clamp(10px, 5cqw, 15px)/1 var(--font); color: var(--muted); align-self: center; }
+
+.album__note { margin: 0; max-width: 62ch; color: var(--muted); font: 400 14px/1.6 var(--font); }

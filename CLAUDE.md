@@ -54,8 +54,14 @@ true of.
   `tileOnScreen` as to the camera.
 - The trail is SOLVED with `trailToRotateDeg` for the count being laid out.
   The direction cycles with the square count as well as the rotation.
-- Covers turn with their tiles; only the label counter-rotates, and it sits on
-  the tile's centre line so the square clip box never cuts it.
+- Covers STAY LEVEL: `toCssContentTransform(frame)` on the artwork, about its
+  own 50% 50% origin. The cover swell in that transform is what keeps the
+  rotated square filling its clip box. The label is held level the same way
+  without the swell and sits on the tile's centre line, so the square clip box
+  never cuts it. `{ counterRotate: false }` is the turning version.
+- Every cover opens its record. The track list is a nested GoldenGrid whose
+  `placement` follows the track count (parity), in a dialog that inerts the
+  stage and locks the page scroll, because the dial's depth is the scroll.
 - The fading window plus `tileOnScreen` plus a sub-pixel check keep the paint
   count between twelve and fourteen. A solid tail looks better mid-turn and
   paints all twenty-one — see the README's "What did not".

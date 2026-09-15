@@ -95,20 +95,44 @@ prescribes.
 
 The brief asks for both to be made early and stated.
 
-**1. The covers turn with their tiles.** Only the label counter-rotates, via
-`toCssContentTransform(frame, { cover: false })`. Album art reads as an object
-rather than a window, so rotation costs it nothing, and the turning version is
-the one that travels. Upright is one line away — put
-`toCssContentTransform(frame)` on `.dial__art` with a 50% 50% origin — and the
-study tried both. The label sits on the tile's centre line and is scaled back
-up by the tile's net scale, because a corner-anchored label is cut off by the
-tile's square clip box the moment the dial turns.
+**1. The covers stay level.** Both versions were built and the level one won.
+Turning art is the more dramatic still, but in motion a cover that spins reads
+as a spinning picture rather than as a record you are moving past, and
+twenty-one of them turning at once is a great deal of rotation on screen.
+
+`toCssContentTransform(frame)` on the artwork does it: counter-rotation about
+the tile's own centre — unlike the tile matrix, which assumes a zero origin —
+plus the |cos| + |sin| cover swell that keeps the rotated square filling its
+clip box, exactly 1 at rest and √2 at worst. The label is held level the same
+way without the swell, sits on the tile's centre line, and is scaled back up
+by the tile's net scale; a corner-anchored label is cut off by the square clip
+box the moment the dial turns. `{ counterRotate: false }` is the turning
+version, one argument away.
 
 **2. The artwork is sourced at the tile's texture box.** Every tile renders
 into a fixed 512px box and the camera scales that box, so full-resolution art
 costs exactly the smoothness that makes the dial worth showing. `TEXTURE_PX`
 in `src/assets.ts` is the single source of that number and the asset spec
 quotes it.
+
+## Clicking a record
+
+Every cover is a control. Clicking one opens that record, and the track list
+is laid out as a golden grid of its own — a second, nested use of the library
+inside the thing the dial was showing. Five tracks, largest box first: the
+same descent the collection uses, one scale down.
+
+The track grid's `placement` follows the track count rather than being fixed,
+because `right` and `left` give a landscape band only at an even box count and
+`top` and `bottom` only at an odd one. Five tracks under `right` would be a
+5:8 portrait and the opening track would fall off the bottom of the panel.
+
+It is a dialog rather than an expanded cell, because the dial is a sticky,
+viewport-tall stage that cannot grow the way a band can. It covers the stage,
+takes focus, makes the stage `inert`, locks the page scroll — the dial's depth
+*is* the scroll position, so leaving it live would spin the stage behind the
+panel — and gives all of it back on close, with focus returning to the cover
+that opened it. Escape closes.
 
 ## Reduced motion
 
@@ -182,8 +206,13 @@ oldest.
 - **The trail solve.** Rotating the layout so the spiral grows into the open
   side of the stage is what keeps a wide desktop stage and a tall phone stage
   both full. It has to be solved for the count, not fixed.
-- **The label rule.** Counter-rotating the label and scaling it by the tile's
-  own net scale keeps text legible from the focus all the way to the eye.
+- **The counter-rotation.** Holding the artwork level while its tile travels
+  the spiral is what makes the dial read as movement through a collection
+  rather than as a spinning picture. The same call, without the cover swell,
+  keeps the labels legible from the focus all the way to the eye.
+- **The nested grid.** A record's track list laid out by the same library, one
+  scale down, makes the proportion argument twice on one page without saying
+  it twice.
 
 ## What did not
 

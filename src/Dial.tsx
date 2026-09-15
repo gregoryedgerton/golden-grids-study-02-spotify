@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   GoldenGrid,
   GoldenBox,
@@ -14,6 +14,7 @@ import {
 import type { SpiralTrail } from "@gifcommit/golden-grids";
 import { useReducedMotion } from "./lib/motion";
 import { records, study } from "./content";
+import type { Record_ } from "./content";
 import { covers, TEXTURE_PX } from "./assets";
 import "./dial.css";
 
@@ -33,11 +34,15 @@ import "./dial.css";
  * The two decisions the brief asks to make early, both made here and both
  * stated on the page:
  *
- *   1. **The covers turn with their tiles.** Album art reads as an object
- *      rather than a window, so rotation costs it nothing and the turning
- *      version is the one that travels. Only the label counter-rotates, via
- *      `toCssContentTransform`; set `counterRotate: false` there to see the
- *      conservative version.
+ *   1. **The covers stay level.** Both were built and the level version won.
+ *      Turning art is the more dramatic still, but in motion a cover that
+ *      spins reads as a spinning picture rather than as a record you are
+ *      moving past, and every cover turning at once is a lot of rotation on
+ *      screen at once. `toCssContentTransform(frame)` on the artwork does it:
+ *      counter-rotation about the tile's centre plus the |cos| + |sin| cover
+ *      swell that keeps a rotated square filling its clip box — exactly 1 at
+ *      rest, √2 at worst. The same call without the swell holds the label
+ *      level. `{ counterRotate: false }` is the turning version.
  *   2. **The artwork is sourced at the tile's texture box.** Each tile
  *      renders into a fixed 512px box and the camera scales that box;
  *      full-resolution art costs exactly the smoothness that makes the dial
@@ -103,12 +108,101 @@ function StaticFallback() {
   );
 }
 
+/**
+ * The album view. Clicking a cover opens the record it belongs to, and the
+ * track list is laid out as a GoldenGrid of its own — a second, nested use of
+ * the library inside the thing the dial was showing. The tracks descend the
+ * way the records do, so the same proportion carries the same meaning at both
+ * scales: the opener takes the largest box.
+ *
+ * It is a dialog, not a band: the dial behind it is a sticky, viewport-tall
+ * stage that cannot grow, so the panel covers it, takes focus, traps nothing
+ * but makes the stage inert, and gives the page back its scroll on close.
+ */
+function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const index = records.indexOf(record);
+  // Parity, from the library's own geometry: right/left give a landscape band
+  // only when the box count is even, top/bottom only when it is odd. The
+  // dialog is wider than it is tall, so the placement follows the track count
+  // rather than being fixed — five tracks would be a 5:8 portrait under
+  // `right`, and the opener would fall off the bottom of the panel.
+  const placement = record.tracks.length % 2 === 0 ? "right" : "bottom";
+
+  useEffect(() => {
+    closeRef.current?.focus({ preventScroll: true });
+    const stage = document.querySelector<HTMLElement>(".dial__stage");
+    if (stage) stage.inert = true;
+    // The dial's depth is the page's scroll position, so leaving the page
+    // scrollable would spin the stage behind the panel.
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      onClose();
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => {
+      if (stage) stage.inert = false;
+      document.body.style.overflow = overflow;
+      window.removeEventListener("keydown", onKey, true);
+    };
+  }, [onClose]);
+
+  return (
+    <div className="album" role="dialog" aria-modal="true" aria-label={`${record.album} by ${record.artist}`}>
+      <header className="album__head">
+        <img className="album__cover" src={covers[index]} alt="" />
+        <div className="album__meta">
+          <p className="album__kind">Album</p>
+          <h2 className="album__title">{record.album}</h2>
+          <p className="album__sub">
+            {record.artist} · {record.year} · {record.tracks.length} songs
+          </p>
+        </div>
+        <button ref={closeRef} type="button" className="album__close" onClick={onClose} aria-label="Close">×</button>
+      </header>
+
+      <div className="album__grid">
+        <GoldenGrid from={1} to={record.tracks.length} placement={placement} clockwise={false}>
+          {record.tracks.map(([title, time], i) => (
+            <GoldenBox key={title}>
+              <div className="track">
+                <span className="track__n">{i + 1}</span>
+                <span className="track__title">{title}</span>
+                <span className="track__time">{time}</span>
+              </div>
+            </GoldenBox>
+          ))}
+        </GoldenGrid>
+      </div>
+
+      <p className="album__note">
+        The track list is a second golden grid, nested inside the record the
+        dial was showing. {record.tracks.length} tracks, largest box first — the
+        same descent the collection uses, one scale down. Its{" "}
+        <code>placement</code> follows the track count, because right and left
+        are landscape only at an even count and top and bottom only at an odd
+        one.
+      </p>
+    </div>
+  );
+}
+
 function ScrollDial() {
   const bodyRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const tilesRef = useRef<(HTMLDivElement | null)[]>([]);
   const readoutRef = useRef<HTMLParagraphElement>(null);
   const [trail, setTrail] = useState<SpiralTrail>("bottom");
+  const [open, setOpen] = useState<Record_ | null>(null);
+  const openerRef = useRef<HTMLButtonElement | null>(null);
+  const close = useCallback(() => {
+    setOpen(null);
+    requestAnimationFrame(() => openerRef.current?.focus());
+  }, []);
 
   // Rebuilt only when the open side of the stage changes. The trail is
   // SOLVED for the count being laid out: which side the spiral grows into
@@ -161,8 +255,14 @@ function ScrollDial() {
         tile.style.transform = toCssTileTransform(frame, square, width, height, { anchor, texturePx: TEXTURE_PX });
         tile.style.opacity = String(opacity);
         tile.style.visibility = hidden || !onScreen || tooSmall ? "hidden" : "visible";
-        // The label orbits with its tile but never spins, and is scaled back
-        // up by the tile's net scale so it stays a readable size at any depth.
+        // The artwork orbits with its tile but never spins: counter-rotation
+        // about the tile's own centre, with the cover swell that keeps the
+        // rotated square filling its clip box. The tile still travels the
+        // spiral; only the picture inside it stays level.
+        const art = tile.firstElementChild as HTMLElement;
+        art.style.transform = toCssContentTransform(frame);
+        // The label is held level the same way, without the swell, and is
+        // scaled back up by the tile's net scale so it stays a readable size.
         const label = tile.lastElementChild as HTMLElement;
         label.style.transform = toCssContentTransform(frame, { cover: false });
         const net = (frame.scale * square.size) / TEXTURE_PX;
@@ -207,6 +307,14 @@ function ScrollDial() {
               style={{ width: TEXTURE_PX, height: TEXTURE_PX, visibility: "hidden" }}
             >
               <img className="dial__art" src={covers[COUNT - 1 - k]} alt="" draggable={false} />
+              {/* The cover is the control: every record on the dial opens. */}
+              <button
+                type="button"
+                className="dial__open"
+                onClick={(e) => { openerRef.current = e.currentTarget; setOpen(r); }}
+              >
+                <span className="visually-hidden">Open {r.album} by {r.artist}</span>
+              </button>
               <div className="dial__label" aria-hidden="true">
                 <span className="cover__label">
                   <b>{r.album}</b>
@@ -221,6 +329,7 @@ function ScrollDial() {
           <p className="dial__hint">{study.hint}</p>
         </div>
       </div>
+      {open && <AlbumView record={open} onClose={close} />}
     </div>
   );
 }
