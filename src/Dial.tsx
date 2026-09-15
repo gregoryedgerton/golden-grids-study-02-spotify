@@ -132,12 +132,35 @@ function StaticFallback() {
  */
 function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }) {
   const backRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const index = records.indexOf(record);
 
   useEffect(() => {
     backRef.current?.focus({ preventScroll: true });
-    const stage = document.querySelector<HTMLElement>(".dial__stage");
-    if (stage) stage.inert = true;
+    // Everything outside the dialog goes inert, not just the stage. Inerting
+    // the stage alone left the skip link and the colophon tabbable, and one
+    // Tab reached a link behind the opaque panel — which scrolls it into
+    // view, and on this page the scroll position IS the dial's depth. The
+    // dialog would then hand focus back to the right cover at the wrong
+    // depth. `aria-modal` promises this containment; the walk delivers it.
+    const panel = panelRef.current;
+    const marked: HTMLElement[] = [];
+    const walk = (node: HTMLElement) => {
+      for (const child of Array.from(node.children)) {
+        if (!(child instanceof HTMLElement) || child === panel) continue;
+        // Descend through the dialog's own ancestors rather than inerting
+        // them, or the dialog would inert itself.
+        if (panel && child.contains(panel)) { walk(child); continue; }
+        // The study tools are a deliberate layer above the dialog and stay
+        // live. They are position: fixed, so focusing them cannot scroll the
+        // page, which is the harm this walk exists to prevent.
+        if (child.classList.contains("gg-tools")) continue;
+        if (child.inert) continue;
+        child.inert = true;
+        marked.push(child);
+      }
+    };
+    if (panel) walk(document.body);
     // The dial's depth is the page's scroll position, so leaving the page
     // scrollable would spin the stage behind the panel.
     const { overflow } = document.body.style;
@@ -150,14 +173,16 @@ function AlbumView({ record, onClose }: { record: Record_; onClose: () => void }
     };
     window.addEventListener("keydown", onKey, true);
     return () => {
-      if (stage) stage.inert = false;
+      // Clear exactly what this dialog set, so anything inert for another
+      // reason stays inert.
+      marked.forEach((el) => { el.inert = false; });
       document.body.style.overflow = overflow;
       window.removeEventListener("keydown", onKey, true);
     };
   }, [onClose]);
 
   return (
-    <div className="album" role="dialog" aria-modal="true" aria-label={`${record.album} by ${record.artist}`}>
+    <div className="album" ref={panelRef} role="dialog" aria-modal="true" aria-label={`${record.album} by ${record.artist}`}>
       {/* Top LEFT, not top right: the study tools float fixed at top right on
           a stacking layer far above this dialog, so a control in that corner
           sits under them. The bar is sticky so the way back does not scroll

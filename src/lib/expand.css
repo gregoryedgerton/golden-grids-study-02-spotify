@@ -32,14 +32,17 @@
   outline: 1px solid var(--line, #ddd); outline-offset: -1px;
 }
 .cell__head {
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  display: flex; align-items: center; justify-content: flex-start; gap: 16px;
   padding: 16px 24px; border-bottom: 1px solid var(--line, #ddd);
   /* The band can be taller than the viewport once open; keep the close
-     control reachable without scrolling back to the top. */
+     control reachable without scrolling back to the top. Sticky is why the
+     control cannot sit on the right: the study tools are fixed in that
+     corner above every layer here, so a pinned control there stays buried
+     for the whole life of the open cell. */
   position: sticky; top: 0; z-index: 1;
   background: var(--bg, #fff);
 }
-.cell__title { margin: 0; font: 500 22px/26px var(--font, inherit); letter-spacing: -0.02em; }
+.cell__title { margin: 0; min-width: 0; flex: 1 1 auto; font: 500 22px/26px var(--font, inherit); letter-spacing: -0.02em; }
 .cell__close { font: 400 22px/1 var(--font, inherit); width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--btn, #f2f2f2); color: inherit; cursor: pointer; flex: none; }
 .cell__close:focus-visible { outline: 2px solid var(--fg, #222); outline-offset: 2px; }
 .cell__body { padding: 24px; font: 400 16px/24px var(--font, inherit); }

@@ -1,7 +1,7 @@
 // Stills of the dial at chosen depths: `node captures/dial.cjs <url> <outDir> [depths]`
 const { chromium } = require('playwright');
 (async () => {
-  const [url, out, depthArg = '0,3.5,8,14'] = process.argv.slice(2);
+  const [url, out, depthArg = '0,3.5,8,13'] = process.argv.slice(2);
   const depths = depthArg.split(',').map(Number);
   const browser = await chromium.launch({ channel: 'chrome' });
   for (const w of [390, 820, 1440]) {

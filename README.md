@@ -165,7 +165,8 @@ fallback can be seen and captured without changing a system setting;
 | 390px | ![](captures/dial-390-d3_5.png) | ![](captures/study-reduced-390.png) |
 | 1440px | ![](captures/dial-1440-d3_5.png) | ![](captures/study-reduced-1440.png) |
 
-Stills at four depths and three widths are in `captures/dial-*.png`;
+Stills at four depths (0, 3.5, 8 and 13) and three widths are in
+`captures/dial-*.png`;
 [`captures/dial.cjs`](captures/dial.cjs) takes them.
 
 ## Visual register

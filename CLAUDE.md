@@ -38,7 +38,15 @@ true of.
 - Breakpoints live only in `src/lib/viewport.ts`. Three states, never two.
 - Study tools (`src/lib/tools.tsx`) are the only floating UI. Controls go
   there, on their own stacking layer; the study's stylesheet never styles them.
-  Grid outlines and band notes are off by default.
+  Grid outlines and band notes are off by default. The panel owns the
+  viewport's top-right corner: it is fixed at
+  `top: 12px; right: 12px` with `z-index: 2147483000` (`src/lib/tools.css`) —
+  a collapsed tab, and a 260px-wide panel when open — and nothing the study
+  draws may stack above it. A control the study puts in that corner is
+  covered and cannot be clicked, however it is positioned. Put dialog and
+  panel controls anywhere else; Study 02's album dialog uses a sticky bar at
+  the top left, and an expanded cell's dismiss control sits at its head's
+  left edge for the same reason.
 - Expansion (`src/lib/expand.tsx`) is how a slot shows content it cannot hold:
   the band grows, nothing scrolls inside a box, and the covered content goes
   inert. Every photograph should be expandable — points of interaction are
@@ -64,8 +72,16 @@ true of.
   rotated square filling its clip box. The label is held level the same way
   without the swell and sits on the tile's centre line, so the square clip box
   never cuts it. `{ counterRotate: false }` is the turning version.
-- Every cover opens its record, in a dialog that inerts the stage and locks
-  the page scroll, because the dial's depth is the scroll.
+- Every cover opens its record, in a dialog that inerts EVERYTHING outside
+  itself except the study tools, and locks the page scroll, because the
+  dial's depth is the scroll. Inerting only the stage is not enough: one Tab
+  used to reach a link behind the panel, and focusing an off-screen link
+  scrolls it into view, which rewrites the depth the reader is returning to.
+- The dialog's way out is at its top LEFT and reads *Back to the dial*. It is
+  a return, not a dismiss, because a record is somewhere the reader
+  travelled to. It cannot go top right, which the tools own, and its bar is
+  sticky because a long track list would otherwise scroll the way back off
+  screen.
 - The track list is a LIST, not a grid, and must stay one. It was a golden
   grid and it was wrong: a track list is flat, so a Fibonacci descent asserts
   a hierarchy the content does not have. The spiral is for the collection.

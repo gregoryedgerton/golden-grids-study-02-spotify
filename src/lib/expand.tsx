@@ -167,8 +167,15 @@ export function ExpandedCell({
   return (
     <section className="cell" id={id} ref={ref} aria-label={title}>
       <header className="cell__head">
-        <h3 className="cell__title">{title}</h3>
+        {/* The dismiss control is FIRST, so it renders at the head's left
+            edge. The study tools own the viewport's top-right corner, and
+            this header is sticky, so a control on the right does not merely
+            pass under the tools panel while scrolling — it parks there for
+            as long as the cell is open. It is also the only pointer route
+            out, because an open cell hides its own trigger and inerts every
+            sibling slot. */}
         <button ref={closeRef} type="button" className="cell__close" onClick={onClose} aria-label="Close">×</button>
+        <h3 className="cell__title">{title}</h3>
       </header>
       <div className="cell__body">{children}</div>
     </section>
